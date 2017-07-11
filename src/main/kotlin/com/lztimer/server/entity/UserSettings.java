@@ -1,14 +1,9 @@
 package com.lztimer.server.entity;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.Objects;
 
 /**
@@ -16,7 +11,6 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "user_settings")
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class UserSettings implements Serializable {
 
     private static final long serialVersionUID = 1L;

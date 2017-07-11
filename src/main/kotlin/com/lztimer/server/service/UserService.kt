@@ -78,22 +78,6 @@ class UserService(
 
 
     /**
-     * Not activated users should be automatically deleted after 3 days.
-     *
-     *
-     * This is scheduled to get fired everyday, at 01:00 (am).
-     */
-    @Scheduled(cron = "0 0 1 * * ?")
-    fun removeNotActivatedUsers() {
-        val users = userRepository.findAllByActivatedIsFalseAndCreatedDateBefore(
-                Instant.now().minus(3, ChronoUnit.DAYS))
-        for (user in users) {
-            log.debug("Deleting not activated user {}", user.login)
-            userRepository.delete(user)
-        }
-    }
-
-    /**
      * @return a list of all the authorities
      */
     val authorities: List<String>

@@ -2,24 +2,19 @@ package com.lztimer.server.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.lztimer.server.config.Constants
-import org.hibernate.annotations.BatchSize
-import org.hibernate.annotations.Cache
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import org.hibernate.validator.constraints.Email
-
+import java.io.Serializable
+import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
-import java.io.Serializable
-import java.util.HashSet
 
 /**
  * A user.
  */
 @Entity
 @Table(name = "jhi_user")
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 class User : AbstractAuditingEntity(), Serializable {
 
     @Id
@@ -57,11 +52,7 @@ class User : AbstractAuditingEntity(), Serializable {
     @JsonIgnore
     @ManyToMany
     @JoinTable(name = "jhi_user_authority", joinColumns = arrayOf(JoinColumn(name = "user_id", referencedColumnName = "id")), inverseJoinColumns = arrayOf(JoinColumn(name = "authority_name", referencedColumnName = "name")))
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @BatchSize(size = 20)
     var authorities: Set<Authority>? = HashSet()
-
-
 
     protected fun canEqual(other: Any): Boolean {
         return other is User
