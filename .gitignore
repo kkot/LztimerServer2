@@ -122,6 +122,7 @@ Desktop.ini
 *.*~
 *~
 .merge_file*
+out
 
 ######################
 # Gradle Wrapper
