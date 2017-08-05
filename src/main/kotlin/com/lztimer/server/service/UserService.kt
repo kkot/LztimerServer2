@@ -38,7 +38,7 @@ class UserService(
         newUser.email = email
         newUser.imageUrl = imageUrl
         newUser.langKey = langKey
-        newUser.authorities = setOf(authorityRepository.findOne(AuthoritiesConstants.USER.roleName))
+        newUser.authorities = setOf(authorityRepository.getOne(AuthoritiesConstants.USER.roleName))
         userRepository.save(newUser)
         log.debug("Created Information for User: {}", newUser)
         return newUser

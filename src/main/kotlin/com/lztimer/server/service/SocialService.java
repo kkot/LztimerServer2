@@ -46,10 +46,10 @@ public class SocialService {
     public void deleteUserSocialConnection(String login) {
         ConnectionRepository connectionRepository = usersConnectionRepository.createConnectionRepository(login);
         connectionRepository.findAllConnections().keySet().stream()
-            .forEach(providerId -> {
-                connectionRepository.removeConnections(providerId);
-                log.debug("Delete user social connection providerId: {}", providerId);
-            });
+                .forEach(providerId -> {
+                    connectionRepository.removeConnections(providerId);
+                    log.debug("Delete user social connection providerId: {}", providerId);
+                });
     }
 
     public User createSocialUser(Connection<?> connection, String langKey) {
@@ -106,18 +106,17 @@ public class SocialService {
     @NotNull
     private Set<Authority> getAuthorities() {
         Set<Authority> authorities = new HashSet<>(1);
-        Authority roleUser = authorityRepository.findOne("ROLE_USER");
-        if (roleUser == null) {
-            roleUser = new Authority("ROLE_USER");
-            authorityRepository.save(roleUser);
-        }
+        Optional<Authority> roleUserOpt = authorityRepository.findById("ROLE_USER");
+        Authority roleUser = roleUserOpt.orElseGet(() ->
+                authorityRepository.save(new Authority("ROLE_USER"))
+        );
         authorities.add(roleUser);
         return authorities;
     }
 
     /**
      * @return login if provider manage a login like Twitter or GitHub otherwise email address.
-     *         Because provider like Google or Facebook didn't provide login or login like "12099388847393"
+     * Because provider like Google or Facebook didn't provide login or login like "12099388847393"
      */
     private String getLoginDependingOnProviderId(UserProfile userProfile, String providerId) {
         switch (providerId) {
