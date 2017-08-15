@@ -12,9 +12,10 @@ Hello world
     <input type="submit" value="Sign In (Google)">
 </form>
 
-<script>
-    alert(document.cookie)
-</script>
+<form action="/signin/desktop/google" method="post">
+    <input name="scope" type="hidden" value="https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"/>
+    <input type="submit" value="Sign In Desktop (Google)">
+</form>
 
 </body>
 </html>

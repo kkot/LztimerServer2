@@ -50,7 +50,7 @@ public class CustomSignInAdapter implements SignInAdapter {
             log.error("Social authentication error");
             log.trace("Authentication exception trace: {}", ae);
         }
-        return "TODO";
+        return "/signin/desktop/completed";
     }
 
     private Cookie getSocialAuthenticationCookie(String token) {

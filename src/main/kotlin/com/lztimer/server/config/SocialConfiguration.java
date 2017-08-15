@@ -4,6 +4,8 @@ import com.lztimer.server.repository.CustomSocialUsersConnectionRepository;
 import com.lztimer.server.repository.SocialUserConnectionRepository;
 import com.lztimer.server.security.CustomSignInAdapter;
 import com.lztimer.server.security.TokenProvider;
+import com.lztimer.server.service.SocialService;
+import com.lztimer.server.webapi.DesktopSignInController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -25,9 +27,11 @@ import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.google.connect.GoogleConnectionFactory;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
 
+import java.security.Provider;
+
 /**
  * Basic Spring Social configuration.
- *
+ * <p>
  * <p>
  * Creates the beans necessary to manage Connections to social services and
  * link accounts from those services to internal Users.
@@ -65,10 +69,10 @@ public class SocialConfiguration implements SocialConfigurer {
         if (googleClientId != null && googleClientSecret != null) {
             log.debug("Configuring GoogleConnectionFactory");
             connectionFactoryConfigurer.addConnectionFactory(
-                new GoogleConnectionFactory(
-                    googleClientId,
-                    googleClientSecret
-                )
+                    new GoogleConnectionFactory(
+                            googleClientId,
+                            googleClientSecret
+                    )
             );
         } else {
             log.error("Cannot configure GoogleConnectionFactory id or secret null");
@@ -80,10 +84,10 @@ public class SocialConfiguration implements SocialConfigurer {
         if (facebookClientId != null && facebookClientSecret != null) {
             log.debug("Configuring FacebookConnectionFactory");
             connectionFactoryConfigurer.addConnectionFactory(
-                new FacebookConnectionFactory(
-                    facebookClientId,
-                    facebookClientSecret
-                )
+                    new FacebookConnectionFactory(
+                            facebookClientId,
+                            facebookClientSecret
+                    )
             );
         } else {
             log.error("Cannot configure FacebookConnectionFactory id or secret null");
@@ -107,9 +111,13 @@ public class SocialConfiguration implements SocialConfigurer {
     }
 
     @Bean
-    public ProviderSignInController providerSignInController(ConnectionFactoryLocator connectionFactoryLocator, UsersConnectionRepository usersConnectionRepository, SignInAdapter signInAdapter) {
-        ProviderSignInController providerSignInController = new ProviderSignInController(connectionFactoryLocator, usersConnectionRepository, signInAdapter);
-        providerSignInController.setSignUpUrl("/social/signup");
+    public ProviderSignInController providerSignInController(ConnectionFactoryLocator connectionFactoryLocator,
+                                                             UsersConnectionRepository usersConnectionRepository,
+                                                             SignInAdapter signInAdapter, SocialService socialService,
+                                                             ProviderSignInUtils providerSignInUtils) {
+        ProviderSignInController providerSignInController = new DesktopSignInController(connectionFactoryLocator,
+                usersConnectionRepository, signInAdapter, socialService, providerSignInUtils);
+        providerSignInController.setSignUpUrl("/signin/desktop/new_user");
         providerSignInController.setApplicationUrl(environment.getProperty("spring.application.url"));
         return providerSignInController;
     }
