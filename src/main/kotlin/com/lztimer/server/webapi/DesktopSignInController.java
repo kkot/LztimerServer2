@@ -65,7 +65,7 @@ public class DesktopSignInController extends ProviderSignInController {
     @RequestMapping(value="/{providerId}", method= RequestMethod.GET, params="port")
     public RedirectView signIn(@PathVariable String providerId, @RequestParam("port") Integer port,
                                NativeWebRequest request) {
-        sessionStrategy.setAttribute(request, "port", request.getParameterMap().get("port"));
+        sessionStrategy.setAttribute(request, "port", port);
         request.setAttribute("scope","https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
                 RequestAttributes.SCOPE_REQUEST);
         return this.signIn(providerId, request);
