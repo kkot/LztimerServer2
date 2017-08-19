@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Completed</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" />
 </head>
 <body>
 
 <h1>Completed</h1>
 
 <script>
-    alert(document.cookie);
+    alert("token " + document.cookie['social-authentication']);
+    alert("port " + document.cookie['port']);
 </script>
 
 </body>

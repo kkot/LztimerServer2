@@ -7,15 +7,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.UsersConnectionRepository;
-import org.springframework.social.connect.web.ProviderSignInController;
-import org.springframework.social.connect.web.ProviderSignInUtils;
-import org.springframework.social.connect.web.SignInAdapter;
+import org.springframework.social.connect.web.*;
 import org.springframework.social.support.URIBuilder;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
@@ -33,6 +30,8 @@ public class DesktopSignInController extends ProviderSignInController {
 
     private final SignInAdapter signInAdapter;
 
+    private SessionStrategy sessionStrategy = new HttpSessionSessionStrategy();
+
     public DesktopSignInController(ConnectionFactoryLocator connectionFactoryLocator,
                                    UsersConnectionRepository usersConnectionRepository,
                                    SignInAdapter signInAdapter, SocialService socialService,
@@ -41,6 +40,7 @@ public class DesktopSignInController extends ProviderSignInController {
         this.socialService = socialService;
         this.providerSignInUtils = providerSignInUtils;
         this.signInAdapter = signInAdapter;
+        addSignInInterceptor(new GoogleProviderSigninInterceptor());
     }
 
     @GetMapping("/new_user")
@@ -52,6 +52,7 @@ public class DesktopSignInController extends ProviderSignInController {
             User user = socialService.createSocialUser(connection, langKey.replace("\"", ""));
             signInAdapter.signIn(user.getLogin(), connection, webRequest);
             attributes.addAttribute("just_created", true);
+            attributes.addAttribute("port", sessionStrategy.getAttribute(webRequest, "port"));
             return new RedirectView("completed");
         } catch (Exception e) {
             log.error("Exception creating social user: ", e);
@@ -59,6 +60,15 @@ public class DesktopSignInController extends ProviderSignInController {
                     .queryParam("success", "false")
                     .build().toString(), true);
         }
+    }
+
+    @RequestMapping(value="/{providerId}", method= RequestMethod.GET, params="port")
+    public RedirectView signIn(@PathVariable String providerId, @RequestParam("port") Integer port,
+                               NativeWebRequest request) {
+        sessionStrategy.setAttribute(request, "port", request.getParameterMap().get("port"));
+        request.setAttribute("scope","https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
+                RequestAttributes.SCOPE_REQUEST);
+        return this.signIn(providerId, request);
     }
 
     @GetMapping("/completed")
