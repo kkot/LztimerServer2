@@ -44,9 +44,4 @@ public class CustomSocialUsersConnectionRepository implements UsersConnectionRep
         }
         return new CustomSocialConnectionRepository(userId, socialUserConnectionRepository, connectionFactoryLocator);
     }
-
-    @Override
-    public void setConnectionSignUp(ConnectionSignUp connectionSignUp) {
-        throw new UnsupportedOperationException();
-    }
 }
