@@ -46,7 +46,7 @@ public class PeriodRepositoryIntTest {
     @Before
     public void setUp() throws Exception {
         clock = new MovingClock(Instant.now());
-        authorityRepository.save(new Authority(AuthoritiesConstants.USER.getRoleName()));
+        authorityRepository.save(new Authority(AuthoritiesConstants.USER.getName()));
 
     }
 

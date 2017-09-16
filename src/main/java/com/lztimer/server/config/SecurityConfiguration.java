@@ -93,10 +93,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/profile-info").permitAll()
             .antMatchers("/api/**").authenticated()
             .antMatchers("/management/health").permitAll()
-            .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN.getRoleName())
+            .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN.getName())
             .antMatchers("/v2/api-docs/**").permitAll()
             .antMatchers("/swagger-resources/configuration/ui").permitAll()
-            .antMatchers("/swagger-ui/index.html").hasAuthority(AuthoritiesConstants.ADMIN.getRoleName())
+            .antMatchers("/swagger-ui/index.html").hasAuthority(AuthoritiesConstants.ADMIN.getName())
         .and()
             .apply(securityConfigurerAdapter());
 

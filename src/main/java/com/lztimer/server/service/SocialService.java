@@ -6,7 +6,6 @@ import com.lztimer.server.repository.AuthorityRepository;
 import com.lztimer.server.repository.UserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -103,7 +102,6 @@ public class SocialService {
         return userRepository.save(newUser);
     }
 
-    @NotNull
     private Set<Authority> getAuthorities() {
         Set<Authority> authorities = new HashSet<>(1);
         Authority roleUser = authorityRepository.getOne("ROLE_USER");
