@@ -3,6 +3,9 @@ package com.lztimer.server.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lztimer.server.config.Constants;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Email;
 import java.io.Serializable;
 import java.util.*;
@@ -14,7 +17,8 @@ import javax.validation.constraints.Size;
 /**
  * A user.
  */
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "jhi_user")
 public class User extends AbstractAuditingEntity implements Serializable {

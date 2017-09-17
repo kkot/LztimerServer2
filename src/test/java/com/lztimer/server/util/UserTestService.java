@@ -27,7 +27,7 @@ public class UserTestService {
      * @return new user
      */
     public User createUser(String login) {
-        return userService.createUser(login, "password_" + login, "John", "Doe",
+        return userService.createUser(login, "John", "Doe",
                 login + "@localhost", "http://placehold.it/50x50", "en-US");
     }
 }

@@ -1,7 +1,6 @@
 package com.lztimer.server.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,8 +13,10 @@ import java.io.Serializable;
 /**
  * An authority (a security role) used by Spring Security.
  */
-@Data
-@AllArgsConstructor
+@Builder
+@AllArgsConstructor @NoArgsConstructor
+@Setter @Getter
+@EqualsAndHashCode @ToString
 @Entity
 @Table(name = "jhi_authority")
 public class Authority implements Serializable {
@@ -25,5 +26,5 @@ public class Authority implements Serializable {
     @Size(min = 0, max = 50)
     @Id
     @Column(length = 50)
-    public String name;
+    private String name;
 }

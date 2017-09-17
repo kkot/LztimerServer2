@@ -6,6 +6,7 @@ import com.lztimer.server.repository.AuthorityRepository;
 import com.lztimer.server.repository.UserRepository;
 import com.lztimer.server.security.AuthoritiesConstants;
 import com.lztimer.server.security.SecurityService;
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,14 +23,17 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
+@AllArgsConstructor
 public class UserService {
-    private Logger log = LoggerFactory.getLogger(UserService.class);
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
-    private UserRepository userRepository;
-    private AuthorityRepository authorityRepository;
-    private SecurityService securityService;
+    private final UserRepository userRepository;
 
-    public User createUser(String login, String password, String firstName, String lastName, String email,
+    private final AuthorityRepository authorityRepository;
+
+    private final SecurityService securityService;
+
+    public User createUser(String login, String firstName, String lastName, String email,
                            String imageUrl, String langKey) {
         User newUser = new User();
         newUser.setLogin(login);
