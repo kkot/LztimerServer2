@@ -4,7 +4,7 @@ import com.lztimer.server.LztimerServerApplication;
 import com.lztimer.server.entity.Authority;
 import com.lztimer.server.entity.Period;
 import com.lztimer.server.entity.User;
-import com.lztimer.server.security.AuthoritiesConstants;
+import com.lztimer.server.security.Authorities;
 import com.lztimer.server.util.MovingClock;
 import com.lztimer.server.util.UserTestService;
 import org.junit.Before;
@@ -46,7 +46,7 @@ public class PeriodRepositoryIntTest {
     @Before
     public void setUp() throws Exception {
         clock = new MovingClock(Instant.now());
-        authorityRepository.save(new Authority(AuthoritiesConstants.USER.getName()));
+        authorityRepository.save(new Authority(Authorities.USER.getName()));
 
     }
 

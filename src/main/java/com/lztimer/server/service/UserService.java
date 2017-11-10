@@ -4,7 +4,7 @@ import com.lztimer.server.entity.Authority;
 import com.lztimer.server.entity.User;
 import com.lztimer.server.repository.AuthorityRepository;
 import com.lztimer.server.repository.UserRepository;
-import com.lztimer.server.security.AuthoritiesConstants;
+import com.lztimer.server.security.Authorities;
 import com.lztimer.server.security.SecurityService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class UserService {
         newUser.setEmail(email);
         newUser.setImageUrl(imageUrl);
         newUser.setLangKey(langKey);
-        newUser.setAuthorities(new HashSet<>(Arrays.asList(authorityRepository.getOne(AuthoritiesConstants.USER.getName()))));
+        newUser.setAuthorities(new HashSet<>(Arrays.asList(authorityRepository.getOne(Authorities.USER.getName()))));
         userRepository.save(newUser);
         log.debug("Created Information for User: {}", newUser);
         return newUser;

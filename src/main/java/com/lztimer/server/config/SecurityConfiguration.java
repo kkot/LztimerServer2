@@ -1,6 +1,6 @@
 package com.lztimer.server.config;
 
-import com.lztimer.server.security.AuthoritiesConstants;
+import com.lztimer.server.security.Authorities;
 import com.lztimer.server.security.Http401UnauthorizedEntryPoint;
 import com.lztimer.server.security.JWTConfigurer;
 import com.lztimer.server.security.TokenProvider;
@@ -93,10 +93,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/profile-info").permitAll()
             .antMatchers("/api/**").authenticated()
             .antMatchers("/management/health").permitAll()
-            .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN.getName())
+            .antMatchers("/management/**").hasAuthority(Authorities.ADMIN.getName())
             .antMatchers("/v2/api-docs/**").permitAll()
             .antMatchers("/swagger-resources/configuration/ui").permitAll()
-            .antMatchers("/swagger-ui/index.html").hasAuthority(AuthoritiesConstants.ADMIN.getName())
+            .antMatchers("/swagger-ui/index.html").hasAuthority(Authorities.ADMIN.getName())
         .and()
             .apply(securityConfigurerAdapter());
 

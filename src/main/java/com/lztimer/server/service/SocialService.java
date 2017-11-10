@@ -4,6 +4,7 @@ import com.lztimer.server.entity.Authority;
 import com.lztimer.server.entity.User;
 import com.lztimer.server.repository.AuthorityRepository;
 import com.lztimer.server.repository.UserRepository;
+import com.lztimer.server.security.Authorities;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -104,9 +105,9 @@ public class SocialService {
 
     private Set<Authority> getAuthorities() {
         Set<Authority> authorities = new HashSet<>(1);
-        Authority roleUser = authorityRepository.findOne("ROLE_USER");
+        Authority roleUser = authorityRepository.findOne(Authorities.USER.getName());
         if (roleUser == null) {
-            roleUser = authorityRepository.save(new Authority("ROLE_USER"));
+            roleUser = authorityRepository.save(new Authority(Authorities.USER.getName()));
         }
         authorities.add(roleUser);
         return authorities;
