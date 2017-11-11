@@ -1,13 +1,15 @@
 package com.lztimer.server.config;
 
-import com.lztimer.server.security.Authorities;
-import com.lztimer.server.security.Http401UnauthorizedEntryPoint;
-import com.lztimer.server.security.JWTConfigurer;
-import com.lztimer.server.security.TokenProvider;
+import com.google.common.io.Resources;
+import com.lztimer.server.security.*;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,8 +21,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.SSLContext;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Configuration
 @EnableWebSecurity
@@ -114,5 +123,25 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public Http401UnauthorizedEntryPoint http401UnauthorizedEntryPoint() {
         return new Http401UnauthorizedEntryPoint();
+    }
+
+    //@Bean
+    public RestTemplate k8sRestTemplate() throws URISyntaxException {
+
+        RestTemplate restTemplate = new RestTemplate();
+       URL certUrl = Resources.getResource("ssl/cert.pem");
+        Path caCertFile = Paths.get(certUrl.toURI());
+
+        if (Files.exists(caCertFile) && Files.isRegularFile(caCertFile)) {
+            SSLContext sslContext = SslUtils.createSslContextFromCertFile(caCertFile);
+            CloseableHttpClient httpsClient = HttpClients.custom().useSystemProperties().setSSLContext(sslContext).build();
+            restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(httpsClient));
+
+        } else {
+            //LOGGER.warn("Certificate file {} is not found, Kubernetes api client will not be configured to use HTTPS protocol.", caCertFile.toString());
+            restTemplate.setRequestFactory(new SimpleClientHttpRequestFactory());
+        }
+
+        return restTemplate;
     }
 }
