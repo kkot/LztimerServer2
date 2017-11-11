@@ -3,6 +3,7 @@ package com.lztimer.server.config;
 import com.lztimer.server.repository.CustomSocialUsersConnectionRepository;
 import com.lztimer.server.repository.SocialUserConnectionRepository;
 import com.lztimer.server.security.CustomSignInAdapter;
+import com.lztimer.server.security.StateProvider;
 import com.lztimer.server.security.TokenProvider;
 import com.lztimer.server.service.SocialService;
 import com.lztimer.server.webapi.DesktopSignInController;
@@ -27,8 +28,6 @@ import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.google.connect.GoogleConnectionFactory;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
 
-import java.security.Provider;
-
 /**
  * Basic Spring Social configuration.
  * <p>
@@ -46,11 +45,14 @@ public class SocialConfiguration implements SocialConfigurer {
 
     private final Environment environment;
 
+    private final StateProvider stateProvider;
+
     public SocialConfiguration(SocialUserConnectionRepository socialUserConnectionRepository,
-                               Environment environment) {
+                               Environment environment, StateProvider stateProvider) {
 
         this.socialUserConnectionRepository = socialUserConnectionRepository;
         this.environment = environment;
+        this.stateProvider = stateProvider;
     }
 
     @Bean
@@ -72,7 +74,12 @@ public class SocialConfiguration implements SocialConfigurer {
                     new GoogleConnectionFactory(
                             googleClientId,
                             googleClientSecret
-                    )
+                    ) {
+                        @Override
+                        public String generateState() {
+                            return stateProvider.generateState();
+                        }
+                    }
             );
         } else {
             log.error("Cannot configure GoogleConnectionFactory id or secret null");
