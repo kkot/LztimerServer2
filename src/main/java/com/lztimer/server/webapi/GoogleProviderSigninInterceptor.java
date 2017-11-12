@@ -1,5 +1,6 @@
 package com.lztimer.server.webapi;
 
+import com.lztimer.server.config.SocialProviders;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionFactory;
 import org.springframework.social.connect.web.ProviderSignInInterceptor;
@@ -14,9 +15,15 @@ import org.springframework.web.context.request.WebRequest;
  */
 public class GoogleProviderSigninInterceptor implements ProviderSignInInterceptor<Google> {
 
+    private final SocialProviders socialProviders;
+
+    public GoogleProviderSigninInterceptor(SocialProviders socialProviders) {
+        this.socialProviders = socialProviders;
+    }
+
     @Override
     public void preSignIn(ConnectionFactory<Google> connectionFactory, MultiValueMap<String, String> parameters, WebRequest request) {
-        parameters.add("scope", "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email");
+        parameters.add("scope", socialProviders.getScope("google"));
     }
 
     @Override

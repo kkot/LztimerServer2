@@ -1,5 +1,6 @@
 package com.lztimer.server.webapi;
 
+import com.lztimer.server.config.SocialProviders;
 import com.lztimer.server.entity.User;
 import com.lztimer.server.service.SocialService;
 import org.slf4j.Logger;
@@ -9,7 +10,6 @@ import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.connect.web.*;
 import org.springframework.social.support.URIBuilder;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestAttributes;
@@ -30,17 +30,20 @@ public class DesktopSignInController extends ProviderSignInController {
 
     private final SignInAdapter signInAdapter;
 
+    private final SocialProviders socialProviders;
+
     private SessionStrategy sessionStrategy = new HttpSessionSessionStrategy();
 
     public DesktopSignInController(ConnectionFactoryLocator connectionFactoryLocator,
                                    UsersConnectionRepository usersConnectionRepository,
                                    SignInAdapter signInAdapter, SocialService socialService,
-                                   ProviderSignInUtils providerSignInUtils) {
+                                   ProviderSignInUtils providerSignInUtils, SocialProviders socialProviders) {
         super(connectionFactoryLocator, usersConnectionRepository, signInAdapter);
         this.socialService = socialService;
         this.providerSignInUtils = providerSignInUtils;
         this.signInAdapter = signInAdapter;
-        addSignInInterceptor(new GoogleProviderSigninInterceptor());
+        this.socialProviders = socialProviders;
+        addSignInInterceptor(new GoogleProviderSigninInterceptor(socialProviders));
     }
 
     @GetMapping("/new_user")
@@ -66,8 +69,7 @@ public class DesktopSignInController extends ProviderSignInController {
     public RedirectView signIn(@PathVariable String providerId, @RequestParam("port") Integer port,
                                NativeWebRequest request) {
         sessionStrategy.setAttribute(request, "port", port);
-        request.setAttribute("scope","https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
-                RequestAttributes.SCOPE_REQUEST);
+        request.setAttribute("scope", socialProviders.getScope(providerId), RequestAttributes.SCOPE_REQUEST);
         return this.signIn(providerId, request);
     }
 

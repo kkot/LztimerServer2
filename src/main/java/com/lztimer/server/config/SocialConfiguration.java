@@ -47,12 +47,15 @@ public class SocialConfiguration implements SocialConfigurer {
 
     private final StateProvider stateProvider;
 
+    private final SocialProviders socialProviders;
+
     public SocialConfiguration(SocialUserConnectionRepository socialUserConnectionRepository,
-                               Environment environment, StateProvider stateProvider) {
+                               Environment environment, StateProvider stateProvider, SocialProviders socialProviders) {
 
         this.socialUserConnectionRepository = socialUserConnectionRepository;
         this.environment = environment;
         this.stateProvider = stateProvider;
+        this.socialProviders = socialProviders;
     }
 
     @Bean
@@ -123,7 +126,7 @@ public class SocialConfiguration implements SocialConfigurer {
                                                              SignInAdapter signInAdapter, SocialService socialService,
                                                              ProviderSignInUtils providerSignInUtils) {
         ProviderSignInController providerSignInController = new DesktopSignInController(connectionFactoryLocator,
-                usersConnectionRepository, signInAdapter, socialService, providerSignInUtils);
+                usersConnectionRepository, signInAdapter, socialService, providerSignInUtils, socialProviders);
         providerSignInController.setSignUpUrl("/signin/desktop/new_user");
         providerSignInController.setApplicationUrl(environment.getProperty("spring.application.url"));
         return providerSignInController;
