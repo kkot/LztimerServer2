@@ -13,11 +13,11 @@ import java.util.Optional;
 public class SpringSecurityAuditorAware implements AuditorAware<String> {
 
     @Override
-    public String getCurrentAuditor() {
+    public Optional<String> getCurrentAuditor() {
         String userName = SecurityUtils.getCurrentUserLogin();
         if (userName != null) {
-            return userName;
+            return Optional.of(userName);
         }
-        return Constants.SYSTEM_ACCOUNT;
+        return Optional.of(Constants.SYSTEM_ACCOUNT);
     }
 }

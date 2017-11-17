@@ -105,11 +105,11 @@ public class SocialService {
 
     private Set<Authority> getAuthorities() {
         Set<Authority> authorities = new HashSet<>(1);
-        Authority roleUser = authorityRepository.findOne(Authorities.USER.getName());
-        if (roleUser == null) {
-            roleUser = authorityRepository.save(new Authority(Authorities.USER.getName()));
+        Optional<Authority> roleUser = authorityRepository.findById(Authorities.USER.getName());
+        if (!roleUser.isPresent()) {
+            roleUser = Optional.of(authorityRepository.save(new Authority(Authorities.USER.getName())));
         }
-        authorities.add(roleUser);
+        authorities.add(roleUser.get());
         return authorities;
     }
 
