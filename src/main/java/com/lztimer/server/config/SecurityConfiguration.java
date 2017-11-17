@@ -1,9 +1,6 @@
 package com.lztimer.server.config;
 
-import com.google.common.io.Resources;
 import com.lztimer.server.security.*;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -126,22 +123,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     //@Bean
-    public RestTemplate k8sRestTemplate() throws URISyntaxException {
-
-        RestTemplate restTemplate = new RestTemplate();
-       URL certUrl = Resources.getResource("ssl/cert.pem");
-        Path caCertFile = Paths.get(certUrl.toURI());
-
-        if (Files.exists(caCertFile) && Files.isRegularFile(caCertFile)) {
-            SSLContext sslContext = SslUtils.createSslContextFromCertFile(caCertFile);
-            CloseableHttpClient httpsClient = HttpClients.custom().useSystemProperties().setSSLContext(sslContext).build();
-            restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(httpsClient));
-
-        } else {
-            //LOGGER.warn("Certificate file {} is not found, Kubernetes api client will not be configured to use HTTPS protocol.", caCertFile.toString());
-            restTemplate.setRequestFactory(new SimpleClientHttpRequestFactory());
-        }
-
-        return restTemplate;
-    }
+//    public RestTemplate k8sRestTemplate() throws URISyntaxException {
+//
+//        RestTemplate restTemplate = new RestTemplate();
+//       URL certUrl = Resources.getResource("ssl/cert.pem");
+//        Path caCertFile = Paths.get(certUrl.toURI());
+//
+//        if (Files.exists(caCertFile) && Files.isRegularFile(caCertFile)) {
+//            SSLContext sslContext = SslUtils.createSslContextFromCertFile(caCertFile);
+//            CloseableHttpClient httpsClient = HttpClients.custom().useSystemProperties().setSSLContext(sslContext).build();
+//            restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(httpsClient));
+//
+//        } else {
+//            //LOGGER.warn("Certificate file {} is not found, Kubernetes api client will not be configured to use HTTPS protocol.", caCertFile.toString());
+//            restTemplate.setRequestFactory(new SimpleClientHttpRequestFactory());
+//        }
+//
+//        return restTemplate;
+//    }
 }

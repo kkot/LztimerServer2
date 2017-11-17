@@ -12,12 +12,17 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.support.ClientHttpRequestFactorySelector;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.concurrent.TimeUnit;
 
 import static io.specto.hoverfly.junit.core.SimulationSource.dsl;
 import static io.specto.hoverfly.junit.dsl.HoverflyDsl.response;
@@ -44,6 +49,9 @@ public class DesktopSignInControllerIntTest {
 
     @MockBean
     private StateProvider stateProvider;
+
+    @Autowired
+    private ConnectionFactoryLocator connectionFactoryLocator;
 
     public static SimulationSource dsl1() {
         //response().status(302).header("Location", "http://localhost:8080/signin/desktop/google?state=81093253-44a5-4487-b413-4f2c099d4116&code=4%2F5XSkKkHjLJFItqNMCvT0feOWk1wcj3IGfNfKPFTKndo#"))
@@ -91,6 +99,7 @@ public class DesktopSignInControllerIntTest {
 
     @Before
     public void setupNormal() {
+        connectionFactoryLocator.getConnectionFactory("google");
         when(stateProvider.generateState()).thenReturn("123");
     }
 
@@ -98,6 +107,16 @@ public class DesktopSignInControllerIntTest {
     public static void setUp() throws Exception {
 
         ChromeDriverManager.getInstance().setup();
+        System.setProperty("webdriver.chrome.verboseLogging", "true");
+
+        ChromeOptions chromeOptions = new ChromeOptions();
+        //chromeOptions.addArguments("--headless");
+        //chromeOptions.addArguments("--disable-gpu");
+        chromeOptions.addArguments("--verbose");
+        //chromeOptions.addArguments("--args");
+        chromeOptions.addArguments("--ignore-certificate-errors");
+        chromeOptions.addArguments("--allow-insecure-localhost");
+        chromeOptions.addArguments("--allow-running-insecure-content");
 
         final DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
         final Proxy proxy = new Proxy();
@@ -106,6 +125,7 @@ public class DesktopSignInControllerIntTest {
         proxy.setSslProxy("localhost:" + hoverflyRule.getProxyPort());
         desiredCapabilities.setCapability(CapabilityType.PROXY, proxy);
         desiredCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+        desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
         driver = new ChromeDriver(desiredCapabilities);
     }
 
@@ -118,9 +138,12 @@ public class DesktopSignInControllerIntTest {
     public void helloPageHasTextHelloWorld() throws InterruptedException {
         ClientHttpRequestFactorySelector.setAllTrust(true);
 
+        Thread.sleep(3000);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+
         driver.get("http://localhost:8080/signin/desktop/google?port=" + desktopPort);
 
-        Thread.sleep(1000);
+        Thread.sleep(3000);
 
         assertThat(driver.findElement(By.tagName("body")).getText(), containsString("Completed"));
     }
