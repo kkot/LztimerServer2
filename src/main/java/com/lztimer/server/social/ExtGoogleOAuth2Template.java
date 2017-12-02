@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lztimer.server.config;
+package com.lztimer.server.social;
 
 import java.util.Map;
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lztimer.server.config;
+package com.lztimer.server.social;
 
 import org.springframework.social.google.api.Google;
 import org.springframework.social.google.api.impl.GoogleTemplate;
@@ -26,14 +26,18 @@ import org.springframework.social.oauth2.AbstractOAuth2ServiceProvider;
  */
 public class ExtGoogleServiceProvider extends AbstractOAuth2ServiceProvider<Google> {
 
+    private String userInfoUrl;
+
     public ExtGoogleServiceProvider(
             final String authorizeUrl, final String accessTokenUrl,
+            final String userInfoUrl,
             final String clientId, final String clientSecret) {
         super(new ExtGoogleOAuth2Template(authorizeUrl, accessTokenUrl, clientId, clientSecret));
+        this.userInfoUrl = userInfoUrl;
     }
 
     @Override
     public Google getApi(final String accessToken) {
-        return new GoogleTemplate(accessToken);
+        return new ExtGoogleTemplate(accessToken, userInfoUrl);
     }
 }

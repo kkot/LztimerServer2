@@ -6,6 +6,7 @@ import com.lztimer.server.security.CustomSignInAdapter;
 import com.lztimer.server.security.StateProvider;
 import com.lztimer.server.security.TokenProvider;
 import com.lztimer.server.service.SocialService;
+import com.lztimer.server.social.ExtGoogleConnectionFactory;
 import com.lztimer.server.webapi.DesktopSignInController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,6 @@ import org.springframework.social.connect.web.ProviderSignInController;
 import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.social.connect.web.SignInAdapter;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
-import org.springframework.social.google.connect.GoogleConnectionFactory;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
 
 /**
@@ -71,13 +71,19 @@ public class SocialConfiguration implements SocialConfigurer {
         // Google configuration
         String googleClientId = environment.getProperty("spring.social.google.app-id");
         String googleClientSecret = environment.getProperty("spring.social.google.app-secret");
+        String authorizeUrl = environment.getProperty("spring.social.google.authorize-url");
+        String accessTokenUrl = environment.getProperty("spring.social.google.access-token-url");
+        String userInfoUrl = environment.getProperty("spring.social.google.user-info-url");
+
         if (googleClientId != null && googleClientSecret != null) {
             log.debug("Configuring GoogleConnectionFactory");
             connectionFactoryConfigurer.addConnectionFactory(
-                    new GoogleConnectionFactory(
+                    new ExtGoogleConnectionFactory(
+                            authorizeUrl,
+                            accessTokenUrl,
+                            userInfoUrl,
                             googleClientId,
-                            googleClientSecret
-                    ) {
+                            googleClientSecret) {
                         @Override
                         public String generateState() {
                             return stateProvider.generateState();

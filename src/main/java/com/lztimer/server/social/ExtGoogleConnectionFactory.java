@@ -1,4 +1,4 @@
-package com.lztimer.server.config;
+package com.lztimer.server.social;
 
 import org.springframework.social.connect.UserProfile;
 import org.springframework.social.connect.support.OAuth2ConnectionFactory;
@@ -16,14 +16,16 @@ public class ExtGoogleConnectionFactory extends OAuth2ConnectionFactory<Google> 
 
     public ExtGoogleConnectionFactory(
             final String authorizeUrl, final String accessTokenUrl,
+            final String userInfoUrl,
             final String clientId, final String clientSecret) {
-        super("google", new ExtGoogleServiceProvider(authorizeUrl, accessTokenUrl, clientId, clientSecret),
+        super("google", new ExtGoogleServiceProvider(authorizeUrl, accessTokenUrl, userInfoUrl,
+                        clientId, clientSecret),
                 new GoogleAdapter());
     }
 
     @Override
     protected String extractProviderUserId(final AccessGrant accessGrant) {
-        final Google api = ((GoogleServiceProvider) getServiceProvider()).getApi(accessGrant.getAccessToken());
+        final Google api = ((ExtGoogleServiceProvider) getServiceProvider()).getApi(accessGrant.getAccessToken());
         final UserProfile userProfile = getApiAdapter().fetchUserProfile(api);
         return userProfile.getUsername();
     }
