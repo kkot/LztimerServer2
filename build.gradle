@@ -25,6 +25,13 @@ repositories {
     maven { url "https://repo.spring.io/milestone" }
 }
 
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+}
+
 compileJava.dependsOn(processResources)
 
 dependencies {
