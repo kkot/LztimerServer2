@@ -183,6 +183,7 @@ public class DesktopSignInControllerIntTest {
 
         // then
         assertThat(driver.findElement(By.tagName("body")).getText(), containsString("Completed"));
+        Thread.sleep(1000);
         assertTokenReceived();
     }
 
@@ -196,6 +197,7 @@ public class DesktopSignInControllerIntTest {
             // then
             final String pageAsXml = page.asText();
             assertThat(pageAsXml, containsString("Completed"));
+            Thread.sleep(1000);
             assertTokenReceived();
         }
     }
