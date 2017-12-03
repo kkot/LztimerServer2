@@ -3,6 +3,7 @@ package com.lztimer.server.webapi;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.lztimer.server.LztimerServerApplication;
 import com.lztimer.server.config.SocialProviders;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.social.connect.ConnectionFactoryLocator;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -48,11 +50,11 @@ public class DesktopSignInControllerIntTest {
 
     private static int googlePort = 8123;
 
-    @Rule
-    public WireMockRule wireMockDesktopRule = new WireMockRule(desktopPort);
+    @ClassRule
+    public static WireMockRule wireMockDesktopRule = new WireMockRule(desktopPort);
 
-    @Rule
-    public WireMockRule wireMockGoogleRule = new WireMockRule(googlePort);
+    @ClassRule
+    public static WireMockRule wireMockGoogleRule = new WireMockRule(googlePort);
 
     @MockBean
     private StateProvider stateProvider;
@@ -61,7 +63,14 @@ public class DesktopSignInControllerIntTest {
     private ConnectionFactoryLocator connectionFactoryLocator;
 
     @Before
-    public void setUpGoogle() throws Exception {
+    public void setUp() throws Exception {
+        WireMock.reset();
+        setUpGoogle();
+        setUpDesktop();
+        setupNormal();
+    }
+
+    private void setUpGoogle() throws Exception {
         String clientId = "1377997861-3a8oahagqanum65ipk39boocl5bevue7.apps.googleusercontent.com";
         String redirectUri = "http://localhost:8080/signin/desktop/google";
         String state = "123";
@@ -110,8 +119,8 @@ public class DesktopSignInControllerIntTest {
 
     }
 
-    @Before
-    public void setUpDesktop() {
+    private void setUpDesktop() {
+        WireMock.reset();
         wireMockDesktopRule
                 .stubFor(options(urlPathEqualTo("/"))
                         .willReturn(status(200)
@@ -126,8 +135,7 @@ public class DesktopSignInControllerIntTest {
                         ));
     }
 
-    @Before
-    public void setupNormal() {
+    private void setupNormal() {
         connectionFactoryLocator.getConnectionFactory("google");
         when(stateProvider.generateState()).thenReturn("123");
     }
@@ -136,7 +144,7 @@ public class DesktopSignInControllerIntTest {
         ChromeDriverManager.getInstance().setup();
 
         ChromeOptions chromeOptions = new ChromeOptions();
-        //chromeOptions.addArguments("--headless");
+        chromeOptions.addArguments("--headless");
 
         driver = new ChromeDriver(chromeOptions);
     }
@@ -170,19 +178,6 @@ public class DesktopSignInControllerIntTest {
 
     @Test
     public void htmlUnit_shouldReturnTokenWhenLoginWebsiteWasOpened() throws InterruptedException, IOException {
-        // given
-        try (final WebClient webClient = new WebClient(BrowserVersion.BEST_SUPPORTED)) {
-            // when
-            final HtmlPage page = webClient.getPage("http://localhost:8080/signin/desktop/google?port=" + desktopPort);
-
-            // then
-            final String pageAsXml = page.asText();
-            assertThat(pageAsXml, containsString("Completed"));
-            assertTokenReceived();
-        }
-    }
-    @Test
-    public void htmlUnit_shouldReturnTokenWhenLoginWebsiteWasOpened2() throws InterruptedException, IOException {
         // given
         try (final WebClient webClient = new WebClient(BrowserVersion.BEST_SUPPORTED)) {
             // when
