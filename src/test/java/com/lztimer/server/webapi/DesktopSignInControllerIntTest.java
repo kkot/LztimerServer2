@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.social.connect.ConnectionFactoryLocator;
-import org.springframework.social.support.ClientHttpRequestFactorySelector;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -31,7 +30,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 /**
- * TODO:
+ * Test on getting access token by desktop application using Google sign-in.
  *
  * @author Krzysztof Kot (krzysztof.kot.pl@gmail.com)
  */
@@ -63,12 +62,12 @@ public class DesktopSignInControllerIntTest {
 
     @Before
     public void setUpGoogle() throws Exception {
-
         String clientId = "1377997861-3a8oahagqanum65ipk39boocl5bevue7.apps.googleusercontent.com";
         String redirectUri = "http://localhost:8080/signin/desktop/google";
         String state = "123";
 
         String location = redirectUri + "?state=" + state + "&code=4%2F5XSkKkHjLJFItqNMCvT0feOWk1wcj3IGfNfKPFTKndo#";
+        String token = "ya29.GlsBBfVrCpy5bpQxixKQ5wobD7qW1_bOUC_ckZgSqDu1nh9PICR2b0zitr6KGJz8lhlLTzP7tbpomLeth4LKrsJfN1wXA9LMB7uWgKyfHkSD5bW4KJIuHHhI_BqQ";
 
         wireMockGoogleRule.stubFor(get(urlPathEqualTo("/o/oauth2/auth"))
                 .withQueryParam("client_id", equalTo(clientId))
@@ -85,7 +84,7 @@ public class DesktopSignInControllerIntTest {
         wireMockGoogleRule.stubFor(post(urlPathEqualTo("/o/oauth2/token"))
                 .withRequestBody(equalTo("client_id=" + clientId + "&client_secret=bI4jbbBc_tBwXqzd0yCFxqxi&code=4%2F5XSkKkHjLJFItqNMCvT0feOWk1wcj3IGfNfKPFTKndo&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fsignin%2Fdesktop%2Fgoogle&grant_type=authorization_code"))
                 .willReturn(aResponse().withBody("{\n" +
-                        "  \"access_token\": \"ya29.GlsBBfVrCpy5bpQxixKQ5wobD7qW1_bOUC_ckZgSqDu1nh9PICR2b0zitr6KGJz8lhlLTzP7tbpomLeth4LKrsJfN1wXA9LMB7uWgKyfHkSD5bW4KJIuHHhI_BqQ\", \n" +
+                        "  \"access_token\": \"" + token + "\", \n" +
                         "  \"token_type\": \"Bearer\", \n" +
                         "  \"expires_in\": 3600, \n" +
                         "  \"refresh_token\": \"1/IwS67z9rCLZczc7eMNqzY6z5oIG2cTz2a10f6zsp5E8\"\n" +
@@ -93,7 +92,7 @@ public class DesktopSignInControllerIntTest {
                         .withHeader("Content-Type", "application/json; charset=UTF-8"))
         );
         wireMockGoogleRule.stubFor(get(urlPathEqualTo("/oauth2/v2/userinfo"))
-                .withQueryParam("access_token", equalTo("ya29.GlsBBfVrCpy5bpQxixKQ5wobD7qW1_bOUC_ckZgSqDu1nh9PICR2b0zitr6KGJz8lhlLTzP7tbpomLeth4LKrsJfN1wXA9LMB7uWgKyfHkSD5bW4KJIuHHhI_BqQ"))
+                .withQueryParam("access_token", equalTo(token))
                 .willReturn(aResponse().withBody("{\n" +
                         "  \"family_name\": \"Kot\", \n" +
                         "  \"name\": \"Krzysztof Kot\", \n" +
@@ -112,73 +111,87 @@ public class DesktopSignInControllerIntTest {
     }
 
     @Before
-    public void setupNormal() {
-        connectionFactoryLocator.getConnectionFactory("google");
-        when(stateProvider.generateState()).thenReturn("123");
-    }
-
-    @BeforeClass
-    public static void setUp() throws Exception {
-        ChromeDriverManager.getInstance().setup();
-
-        ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("--headless");
-
-        driver = new ChromeDriver(chromeOptions);
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        driver.close();
-    }
-
-    @Test
-    public void helloPageHasTextHelloWorld() throws InterruptedException {
+    public void setUpDesktop() {
         wireMockDesktopRule
                 .stubFor(options(urlPathEqualTo("/"))
                         .willReturn(status(200)
                                 .withHeader("Access-Control-Allow-Origin", "*")
                                 .withHeader("Access-Control-Allow-Methods", "*")
-                                .withHeader("Access-Control-Allow-Headers", "Content-Type","Accept-Encoding", "Accept", "DNT")
+                                .withHeader("Access-Control-Allow-Headers", "Content-Type", "Accept-Encoding", "Accept", "DNT")
                         ));
         wireMockDesktopRule
                 .stubFor(post(urlPathEqualTo("/"))
                         .willReturn(status(200)
                                 .withHeader("Access-Control-Allow-Origin", "*")
                         ));
+    }
 
-        Thread.sleep(3000);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+    @Before
+    public void setupNormal() {
+        connectionFactoryLocator.getConnectionFactory("google");
+        when(stateProvider.generateState()).thenReturn("123");
+    }
 
-        driver.get("http://localhost:8080/signin/desktop/google?port=" + desktopPort);
+    private void initChromeDriver() throws Exception {
+        ChromeDriverManager.getInstance().setup();
 
-        Thread.sleep(1000);
+        ChromeOptions chromeOptions = new ChromeOptions();
+        //chromeOptions.addArguments("--headless");
 
-        assertThat(driver.findElement(By.tagName("body")).getText(), containsString("Completed"));
+        driver = new ChromeDriver(chromeOptions);
+    }
 
+    @After
+    public void tearDown() {
+        if (driver != null) {
+            driver.close();
+        }
+    }
+
+    private void assertTokenReceived() {
         wireMockDesktopRule
                 .verify(postRequestedFor(urlPathEqualTo("/"))
                         .withRequestBody(containing("token")));
-
-        Thread.sleep(1000);
     }
 
     //@Test
-    public void helloPageHasTextHelloWorld2() throws InterruptedException, IOException {
-        ClientHttpRequestFactorySelector.setAllTrust(true);
+    public void chrome_shouldReturnTokenWhenLoginWebsiteWasOpened() throws Exception {
+        // given
+        initChromeDriver();
+        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 
+        // when
+        driver.get("http://localhost:8080/signin/desktop/google?port=" + desktopPort);
+
+        // then
+        assertThat(driver.findElement(By.tagName("body")).getText(), containsString("Completed"));
+        assertTokenReceived();
+    }
+
+    @Test
+    public void htmlUnit_shouldReturnTokenWhenLoginWebsiteWasOpened() throws InterruptedException, IOException {
+        // given
         try (final WebClient webClient = new WebClient(BrowserVersion.BEST_SUPPORTED)) {
-
+            // when
             final HtmlPage page = webClient.getPage("http://localhost:8080/signin/desktop/google?port=" + desktopPort);
 
+            // then
             final String pageAsXml = page.asText();
-            System.out.println(pageAsXml);
-            Assert.assertTrue(pageAsXml.contains("Completed"));
+            assertThat(pageAsXml, containsString("Completed"));
+            assertTokenReceived();
+        }
+    }
+    @Test
+    public void htmlUnit_shouldReturnTokenWhenLoginWebsiteWasOpened2() throws InterruptedException, IOException {
+        // given
+        try (final WebClient webClient = new WebClient(BrowserVersion.BEST_SUPPORTED)) {
+            // when
+            final HtmlPage page = webClient.getPage("http://localhost:8080/signin/desktop/google?port=" + desktopPort);
 
-            Thread.sleep(1000);
-
-//            wireMockRule.verify(postRequestedFor(urlEqualTo("/"))
-//                    .withRequestBody(matching(".*token.*")));
+            // then
+            final String pageAsXml = page.asText();
+            assertThat(pageAsXml, containsString("Completed"));
+            assertTokenReceived();
         }
     }
 }
