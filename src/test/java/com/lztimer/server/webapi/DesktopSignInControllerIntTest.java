@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.lztimer.server.LztimerServerApplication;
 import com.lztimer.server.config.SocialProviders;
+import com.lztimer.server.repository.SocialUserConnectionRepository;
 import com.lztimer.server.security.StateProvider;
 import io.github.bonigarcia.wdm.ChromeDriverManager;
 import org.junit.*;
@@ -50,6 +51,9 @@ public class DesktopSignInControllerIntTest {
 
     private static int googlePort = 8123;
 
+    @Autowired
+    private SocialUserConnectionRepository repository;
+
     @ClassRule
     public static WireMockRule wireMockDesktopRule = new WireMockRule(desktopPort);
 
@@ -65,6 +69,7 @@ public class DesktopSignInControllerIntTest {
     @Before
     public void setUp() throws Exception {
         WireMock.reset();
+        repository.deleteAll();
         setUpGoogle();
         setUpDesktop();
         setupNormal();
@@ -162,7 +167,7 @@ public class DesktopSignInControllerIntTest {
                         .withRequestBody(containing("token")));
     }
 
-    //@Test
+    @Test
     public void chrome_shouldReturnTokenWhenLoginWebsiteWasOpened() throws Exception {
         // given
         initChromeDriver();
