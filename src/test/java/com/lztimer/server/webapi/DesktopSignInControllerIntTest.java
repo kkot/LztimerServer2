@@ -40,6 +40,8 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = LztimerServerApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestPropertySource(properties = {
+        "spring.social.google.app-id=clientId",
+        "spring.social.google.app-secret=secret",
         "spring.social.google.authorize-url=http://localhost:8123/o/oauth2/auth",
         "spring.social.google.access-token-url=http://localhost:8123/o/oauth2/token",
         "spring.social.google.user-info-url=http://localhost:8123/oauth2/v2/userinfo"
@@ -76,12 +78,14 @@ public class DesktopSignInControllerIntTest {
     }
 
     private void setUpGoogle() throws Exception {
-        String clientId = "1377997861-3a8oahagqanum65ipk39boocl5bevue7.apps.googleusercontent.com";
+        String clientId = "clientId";
+        String secret = "secret";
+        String token = "token";
+        String code = "code_string";
         String redirectUri = "http://localhost:8080/signin/desktop/google";
         String state = "123";
 
-        String location = redirectUri + "?state=" + state + "&code=4%2F5XSkKkHjLJFItqNMCvT0feOWk1wcj3IGfNfKPFTKndo#";
-        String token = "ya29.GlsBBfVrCpy5bpQxixKQ5wobD7qW1_bOUC_ckZgSqDu1nh9PICR2b0zitr6KGJz8lhlLTzP7tbpomLeth4LKrsJfN1wXA9LMB7uWgKyfHkSD5bW4KJIuHHhI_BqQ";
+        String location = redirectUri + "?state=" + state + "&code=" + code;
 
         wireMockGoogleRule.stubFor(get(urlPathEqualTo("/o/oauth2/auth"))
                 .withQueryParam("client_id", equalTo(clientId))
@@ -96,27 +100,28 @@ public class DesktopSignInControllerIntTest {
                 )
         );
         wireMockGoogleRule.stubFor(post(urlPathEqualTo("/o/oauth2/token"))
-                .withRequestBody(equalTo("client_id=" + clientId + "&client_secret=bI4jbbBc_tBwXqzd0yCFxqxi&code=4%2F5XSkKkHjLJFItqNMCvT0feOWk1wcj3IGfNfKPFTKndo&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fsignin%2Fdesktop%2Fgoogle&grant_type=authorization_code"))
+                .withRequestBody(equalTo("client_id=" + clientId + "&client_secret=" + secret + "&code=" + code
+                        + "&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fsignin%2Fdesktop%2Fgoogle&grant_type=authorization_code"))
                 .willReturn(aResponse().withBody("{\n" +
                         "  \"access_token\": \"" + token + "\", \n" +
                         "  \"token_type\": \"Bearer\", \n" +
                         "  \"expires_in\": 3600, \n" +
-                        "  \"refresh_token\": \"1/IwS67z9rCLZczc7eMNqzY6z5oIG2cTz2a10f6zsp5E8\"\n" +
+                        "  \"refresh_token\": \"xxx_refresh_token\"\n" +
                         "}")
                         .withHeader("Content-Type", "application/json; charset=UTF-8"))
         );
         wireMockGoogleRule.stubFor(get(urlPathEqualTo("/oauth2/v2/userinfo"))
                 .withQueryParam("access_token", equalTo(token))
                 .willReturn(aResponse().withBody("{\n" +
-                        "  \"family_name\": \"Kot\", \n" +
-                        "  \"name\": \"Krzysztof Kot\", \n" +
-                        "  \"picture\": \"https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg\", \n" +
+                        "  \"family_name\": \"K\", \n" +
+                        "  \"name\": \"Krzysztof K\", \n" +
+                        "  \"picture\": \"photo.jpg\", \n" +
                         "  \"locale\": \"pl\", \n" +
                         "  \"gender\": \"male\", \n" +
-                        "  \"email\": \"krzykot@gmail.com\", \n" +
+                        "  \"email\": \"krzykot123@gmail.com\", \n" +
                         "  \"link\": \"https://plus.google.com/110368901594149035689\", \n" +
                         "  \"given_name\": \"Krzysztof\", \n" +
-                        "  \"id\": \"110368901594149035689\", \n" +
+                        "  \"id\": \"1234\", \n" +
                         "  \"verified_email\": true\n" +
                         "}"
                 ).withHeader("Content-Type", "application/json; charset=UTF-8"))
