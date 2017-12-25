@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Completed</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+</head>
+<body>
+
+<h1>SignIn completed</h1>
+
+<script>
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
+    let port = getCookie("port");
+    let token = getCookie("social-authentication");
+    let targetUrl = "http://localhost:" + port;
+    $.ajax({
+        url: targetUrl,
+        type: "POST",
+        data: JSON.stringify({"token": token }),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (data) {
+            alert(data)
+        }
+    });
+    console.info("Callback on localhost:"+port);
+</script>
+
+</body>
+</html>

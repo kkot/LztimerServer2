@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<h1>Completed</h1>
+<h1>SignUp completed</h1>
 
 <script>
     function getCookie(name) {
@@ -15,24 +15,13 @@
         var parts = value.split("; " + name + "=");
         if (parts.length == 2) return parts.pop().split(";").shift();
     }
-
-    function findGetParameter(parameterName) {
-        var result = null,
-            tmp = [];
-        var items = location.search.substr(1).split("&");
-        for (var index = 0; index < items.length; index++) {
-            tmp = items[index].split("=");
-            if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-        }
-        return result;
-    }
-
-    var port = findGetParameter("port");
-    var targetUrl = "http://localhost:" + port;
+    let port = getCookie("port");
+    let token = getCookie("social-authentication");
+    let targetUrl = "http://localhost:" + port;
     $.ajax({
         url: targetUrl,
         type: "POST",
-        data: JSON.stringify({"token": "123" }),
+        data: JSON.stringify({"token": token }),
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (data) {

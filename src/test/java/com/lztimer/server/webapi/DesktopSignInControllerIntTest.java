@@ -1,8 +1,5 @@
 package com.lztimer.server.webapi;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.lztimer.server.LztimerServerApplication;
@@ -20,11 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.social.connect.ConnectionFactoryLocator;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -67,20 +62,27 @@ public class DesktopSignInControllerIntTest {
 
     @Autowired
     private ConnectionFactoryLocator connectionFactoryLocator;
+    private String token;
+
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        ChromeDriverManager.getInstance().setup();
+    }
 
     @Before
     public void setUp() throws Exception {
         WireMock.reset();
         repository.deleteAll();
-        setUpGoogle();
-        setUpDesktop();
+        setUpGoogleStub();
+        setUpDesktopStub();
         setupNormal();
+        createDriver();
     }
 
-    private void setUpGoogle() throws Exception {
+    private void setUpGoogleStub() throws Exception {
         String clientId = "clientId";
         String secret = "secret";
-        String token = "token";
+        token = "token123";
         String code = "code_string";
         String redirectUri = "http://localhost:8080/signin/desktop/google";
         String state = "123";
@@ -129,7 +131,7 @@ public class DesktopSignInControllerIntTest {
 
     }
 
-    private void setUpDesktop() {
+    private void setUpDesktopStub() {
         WireMock.reset();
         wireMockDesktopRule
                 .stubFor(options(urlPathEqualTo("/"))
@@ -150,12 +152,9 @@ public class DesktopSignInControllerIntTest {
         when(stateProvider.generateState()).thenReturn("123");
     }
 
-    private void initChromeDriver() throws Exception {
-        ChromeDriverManager.getInstance().setup();
-
+    private void createDriver() {
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--headless");
-
         driver = new ChromeDriver(chromeOptions);
     }
 
@@ -166,39 +165,38 @@ public class DesktopSignInControllerIntTest {
         }
     }
 
-    private void assertTokenReceived() {
-        wireMockDesktopRule
-                .verify(postRequestedFor(urlPathEqualTo("/"))
-                        .withRequestBody(containing("token")));
-    }
-
     @Test
-    public void chrome_shouldReturnTokenWhenLoginWebsiteWasOpened() throws Exception {
+    public void shouldReturnTokenWhenLoginWebsiteWasOpened() throws Exception {
         // given
-        initChromeDriver();
         driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 
         // when
         driver.get("http://localhost:8080/signin/desktop/google?port=" + desktopPort);
 
         // then
-        assertThat(driver.findElement(By.tagName("body")).getText(), containsString("Completed"));
+        assertThat(driver.findElement(By.tagName("body")).getText(), containsString("SignUp completed"));
         Thread.sleep(1000);
-        assertTokenReceived();
+        assertTokenReceived(1);
+    }
+
+    private void assertTokenReceived(int times) {
+        wireMockDesktopRule
+                .verify(times, postRequestedFor(urlPathEqualTo("/"))
+                        .withRequestBody(containing("\"token\"")));
     }
 
     @Test
-    public void htmlUnit_shouldReturnTokenWhenLoginWebsiteWasOpened() throws InterruptedException, IOException {
+    public void shouldReturnTokenWhenLoginWebsiteWasOpenedSecondTime() throws Exception {
         // given
-        try (final WebClient webClient = new WebClient(BrowserVersion.BEST_SUPPORTED)) {
-            // when
-            final HtmlPage page = webClient.getPage("http://localhost:8080/signin/desktop/google?port=" + desktopPort);
+        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+        driver.get("http://localhost:8080/signin/desktop/google?port=" + desktopPort);
+        Thread.sleep(1000);
 
-            // then
-            final String pageAsXml = page.asText();
-            assertThat(pageAsXml, containsString("Completed"));
-            Thread.sleep(1000);
-            assertTokenReceived();
-        }
+        // when
+        driver.get("http://localhost:8080/signin/desktop/google?port=" + desktopPort);
+
+        // then
+        assertThat(driver.findElement(By.tagName("body")).getText(), containsString("SignIn completed"));
+        assertTokenReceived(2);
     }
 }

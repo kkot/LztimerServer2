@@ -48,15 +48,13 @@ public class DesktopSignInController extends ProviderSignInController {
 
     @GetMapping("/new_user")
     public RedirectView signUp(NativeWebRequest webRequest,
-                               @CookieValue(name = "NG_TRANSLATE_LANG_KEY", required = false, defaultValue = "\"en\"") String langKey,
+                               @CookieValue(name = "NG_TRANSLATE_LANG_KEY", required = false, defaultValue = "en") String langKey,
                                RedirectAttributes attributes) {
         try {
             Connection<?> connection = providerSignInUtils.getConnectionFromSession(webRequest);
             User user = socialService.createSocialUser(connection, langKey.replace("\"", ""));
             signInAdapter.signIn(user.getLogin(), connection, webRequest);
-            attributes.addAttribute("just_created", true);
-            attributes.addAttribute("port", sessionStrategy.getAttribute(webRequest, "port"));
-            return new RedirectView("completed");
+            return new RedirectView("signup_completed");
         } catch (Exception e) {
             log.error("Exception creating social user: ", e);
             return new RedirectView(URIBuilder.fromUri("/#/social-register/no-provider")
@@ -73,8 +71,13 @@ public class DesktopSignInController extends ProviderSignInController {
         return this.signIn(providerId, request);
     }
 
-    @GetMapping("/completed")
-    public ModelAndView completed(NativeWebRequest webRequest) {
-        return new ModelAndView("/completed.html");
+    @GetMapping("/signup_completed")
+    public ModelAndView signUpCompleted(NativeWebRequest webRequest) {
+        return new ModelAndView("/signup_completed.html");
+    }
+
+    @GetMapping("/signin_completed")
+    public ModelAndView signInCompleted(NativeWebRequest webRequest) {
+        return new ModelAndView("/signin_completed.html");
     }
 }
