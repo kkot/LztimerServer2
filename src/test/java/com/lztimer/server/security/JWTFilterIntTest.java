@@ -11,7 +11,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.*;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -22,6 +26,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * Integration test to check if JWT token can be used to perform HTTP REST request on a controller (as example
@@ -30,11 +35,15 @@ import static org.junit.Assert.assertThat;
  * @author Krzysztof Kot (krzysztof.kot.pl@gmail.com)
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = LztimerServerApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(classes = LztimerServerApplication.class, webEnvironment = RANDOM_PORT)
 public class JWTFilterIntTest {
 
     public static final String TEST_USER_LOGIN = "test_user";
+
     TestRestTemplate restTemplate = new TestRestTemplate();
+
+    @LocalServerPort
+    int port;
 
     @Autowired
     UserService userService;
@@ -67,8 +76,8 @@ public class JWTFilterIntTest {
         HttpEntity<Period> periodEntity = new HttpEntity<>(period, headers);
 
         // when
-        ResponseEntity<String> exchange = restTemplate.exchange("http://localhost:8080/api/periods", // TODO: not hardcode port
-                HttpMethod.POST, periodEntity, String.class);
+        ResponseEntity<String> exchange = restTemplate.postForEntity("http://localhost:" + port + "/api/periods",
+                periodEntity, String.class);
 
         // then
         assertThat(exchange.getStatusCode(), equalTo(HttpStatus.CREATED));
