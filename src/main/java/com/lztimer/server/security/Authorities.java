@@ -2,6 +2,8 @@ package com.lztimer.server.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 /**
  * Authorities.
@@ -14,5 +16,9 @@ public enum Authorities {
 
     @Getter
     private String name;
+
+    public GrantedAuthority toGrantedAuthority() {
+        return new SimpleGrantedAuthority(name);
+    }
 }
 

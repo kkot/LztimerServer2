@@ -77,7 +77,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User userWithAuthorities() {
+    public User getUserWithAuthorities() {
         return userRepository.findOneWithAuthoritiesByLogin(securityService.getCurrentUserLogin()).orElse(null);
     }
 

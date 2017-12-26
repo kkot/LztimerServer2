@@ -5,6 +5,7 @@ import com.lztimer.server.entity.Authority;
 import com.lztimer.server.entity.Period;
 import com.lztimer.server.entity.User;
 import com.lztimer.server.security.Authorities;
+import com.lztimer.server.service.AuthorityService;
 import com.lztimer.server.util.MovingClock;
 import com.lztimer.server.util.UserTestService;
 import org.junit.Before;
@@ -39,15 +40,14 @@ public class PeriodRepositoryIntTest {
     private UserTestService userTestService;
 
     @Autowired
-    private AuthorityRepository authorityRepository;
+    private AuthorityService authorityService;
 
     private MovingClock clock;
 
     @Before
     public void setUp() throws Exception {
         clock = new MovingClock(Instant.now());
-        authorityRepository.save(new Authority(Authorities.USER.getName()));
-
+        authorityService.addStandard();
     }
 
     @Test
