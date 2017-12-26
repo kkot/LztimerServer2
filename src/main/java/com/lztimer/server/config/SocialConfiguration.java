@@ -121,12 +121,6 @@ public class SocialConfiguration implements SocialConfigurer {
     }
 
     @Bean
-    public SignInAdapter signInAdapter(UserDetailsService userDetailsService, TokenProvider tokenProvider,
-                                       ConfigProperties configProperties) {
-        return new CustomSignInAdapter(userDetailsService, configProperties, tokenProvider);
-    }
-
-    @Bean
     public ProviderSignInController providerSignInController(ConnectionFactoryLocator connectionFactoryLocator,
                                                              UsersConnectionRepository usersConnectionRepository,
                                                              SignInAdapter signInAdapter, SocialService socialService,

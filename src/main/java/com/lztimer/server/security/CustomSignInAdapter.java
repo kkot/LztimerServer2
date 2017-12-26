@@ -13,11 +13,13 @@ import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.web.HttpSessionSessionStrategy;
 import org.springframework.social.connect.web.SessionStrategy;
 import org.springframework.social.connect.web.SignInAdapter;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import javax.servlet.http.Cookie;
 
+@Component
 public class CustomSignInAdapter implements SignInAdapter {
 
     @SuppressWarnings("unused")
