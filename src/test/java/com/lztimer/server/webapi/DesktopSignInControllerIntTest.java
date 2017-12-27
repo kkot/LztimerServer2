@@ -19,6 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
@@ -62,7 +63,6 @@ public class DesktopSignInControllerIntTest {
 
     @Autowired
     private ConnectionFactoryLocator connectionFactoryLocator;
-    private String token;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -72,7 +72,6 @@ public class DesktopSignInControllerIntTest {
     @Before
     public void setUp() throws Exception {
         WireMock.reset();
-        repository.deleteAll();
         setUpGoogleStub();
         setUpDesktopStub();
         setupNormal();
@@ -82,7 +81,7 @@ public class DesktopSignInControllerIntTest {
     private void setUpGoogleStub() throws Exception {
         String clientId = "clientId";
         String secret = "secret";
-        token = "token123";
+        String token = "token123";
         String code = "code_string";
         String redirectUri = "http://localhost:8080/signin/desktop/google";
         String state = "123";
@@ -165,17 +164,15 @@ public class DesktopSignInControllerIntTest {
         }
     }
 
-    @Test
+    @Test @Transactional
     public void shouldReturnTokenWhenLoginWebsiteWasOpened() throws Exception {
         // given
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 
         // when
         driver.get("http://localhost:8080/signin/desktop/google?port=" + desktopPort);
 
         // then
         assertThat(driver.findElement(By.tagName("body")).getText(), containsString("SignUp completed"));
-        Thread.sleep(1000);
         assertTokenReceived(1);
     }
 
@@ -185,12 +182,10 @@ public class DesktopSignInControllerIntTest {
                         .withRequestBody(containing("\"token\"")));
     }
 
-    @Test
+    @Test @Transactional
     public void shouldReturnTokenWhenLoginWebsiteWasOpenedSecondTime() throws Exception {
         // given
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
         driver.get("http://localhost:8080/signin/desktop/google?port=" + desktopPort);
-        Thread.sleep(1000);
 
         // when
         driver.get("http://localhost:8080/signin/desktop/google?port=" + desktopPort);
