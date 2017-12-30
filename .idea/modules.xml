@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/lztimer-server2.iml" filepath="$PROJECT_DIR$/lztimer-server2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lztimer-server2.iml" filepath="$PROJECT_DIR$/.idea/modules/lztimer-server2.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/lztimer-server2_main.iml" filepath="$PROJECT_DIR$/.idea/modules/lztimer-server2_main.iml" group="lztimer-server2" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/lztimer-server2_test.iml" filepath="$PROJECT_DIR$/.idea/modules/lztimer-server2_test.iml" group="lztimer-server2" />
     </modules>

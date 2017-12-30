@@ -2,6 +2,7 @@ package com.lztimer.server.webapi;
 
 import com.lztimer.server.entity.Period;
 import com.lztimer.server.repository.PeriodRepository;
+import com.lztimer.server.service.PeriodService;
 import com.lztimer.server.service.UserService;
 import com.lztimer.server.webapi.util.HeaderUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public class PeriodController {
     private static final String ENTITY_NAME = "period";
 
     @Autowired
-    private PeriodRepository periodRepository;
+    private PeriodService periodService;
 
     @Autowired
     private UserService userService;
@@ -45,7 +46,7 @@ public class PeriodController {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new period cannot already have an ID")).body(null);
         }
         period.setOwner(userService.getUserWithAuthorities());
-        Period result = periodRepository.save(period);
+        Period result = periodService.addAndReplace(period);
         return ResponseEntity.created(new URI("/api/periods/" + result.getId()))
                 .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
                 .body(result);

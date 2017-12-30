@@ -5,6 +5,7 @@ import com.lztimer.server.entity.Period;
 import com.lztimer.server.repository.PeriodRepository;
 import com.lztimer.server.service.AuthorityService;
 import com.lztimer.server.service.UserService;
+import com.lztimer.server.util.DbTestUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,9 +39,12 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(classes = LztimerServerApplication.class, webEnvironment = RANDOM_PORT)
 public class JWTFilterIntTest {
 
-    public static final String TEST_USER_LOGIN = "test_user";
+    private static final String TEST_USER_LOGIN = "test_user";
 
-    TestRestTemplate restTemplate = new TestRestTemplate();
+    private TestRestTemplate restTemplate = new TestRestTemplate();
+
+    @Autowired
+    DbTestUtil dbTestUtil;
 
     @LocalServerPort
     int port;
@@ -58,7 +62,8 @@ public class JWTFilterIntTest {
     AuthorityService authorityService;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
+        dbTestUtil.resetDb(); // for integration test @Transactional doesn't work, different Sessions
     }
 
     @Test

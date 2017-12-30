@@ -1,5 +1,7 @@
 package com.lztimer.server.util;
 
+import lombok.NoArgsConstructor;
+
 import java.time.Instant;
 
 /**
@@ -7,6 +9,7 @@ import java.time.Instant;
  *
  * @author Krzysztof Kot (krzysztof.kot.pl@gmail.com)
  */
+@NoArgsConstructor
 public class MovingClock {
     private Instant current = Instant.now();
 

@@ -37,7 +37,7 @@ public class Period implements Serializable {
     private Boolean active;
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(optional = false)
     private User owner;
 
     public Period(Instant beginTime, Instant endTime, Boolean active) {

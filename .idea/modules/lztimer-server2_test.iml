@@ -39,6 +39,7 @@
     <orderEntry type="library" name="Gradle: org.seleniumhq.selenium:htmlunit-driver:2.28.2" level="project" />
     <orderEntry type="library" name="Gradle: net.sourceforge.htmlunit:htmlunit:2.28" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.commons:commons-lang3:3.6" level="project" />
+    <orderEntry type="library" name="Gradle: org.projectlombok:lombok:1.16.18" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-test:2.0.0.M7" level="project" />
     <orderEntry type="library" name="Gradle: com.codeborne:phantomjsdriver:1.4.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.springframework.boot:spring-boot-devtools:2.0.0.M7" level="project" />

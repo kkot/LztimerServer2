@@ -1,5 +1,8 @@
 package com.lztimer.server.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -10,6 +13,7 @@ import java.util.Objects;
  * A UserSettings.
  */
 @Entity
+@Setter @Getter
 @Table(name = "user_settings")
 public class UserSettings implements Serializable {
 
@@ -31,29 +35,9 @@ public class UserSettings implements Serializable {
     @JoinColumn(unique = true)
     private User user;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Integer getMinIdleTime() {
-        return minIdleTime;
-    }
-
     public UserSettings minIdleTime(Integer minIdleTime) {
         this.minIdleTime = minIdleTime;
         return this;
-    }
-
-    public void setMinIdleTime(Integer minIdleTime) {
-        this.minIdleTime = minIdleTime;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
     }
 
     public UserSettings updatedAt(Instant updatedAt) {
@@ -61,21 +45,9 @@ public class UserSettings implements Serializable {
         return this;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
     public UserSettings user(User user) {
         this.user = user;
         return this;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     @Override

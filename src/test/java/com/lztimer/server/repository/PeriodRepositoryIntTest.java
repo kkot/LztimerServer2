@@ -36,6 +36,7 @@ public class PeriodRepositoryIntTest {
     @Autowired
     private PeriodRepository periodRepositoryUnderTest;
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private UserTestService userTestService;
 
@@ -45,13 +46,13 @@ public class PeriodRepositoryIntTest {
     private MovingClock clock;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         clock = new MovingClock(Instant.now());
         authorityService.addStandard();
     }
 
     @Test
-    public void findEndedAfter_shouldOnlyReturnPeriodsAfterDate() throws Exception {
+    public void findEndedAfter_shouldOnlyReturnPeriodsAfterDate() {
         // arrange
         User user = userTestService.createUser("user1");
         Period beforePeriod = new Period(clock.getCurrent(), clock.shiftSeconds(1), false, user);
@@ -69,7 +70,7 @@ public class PeriodRepositoryIntTest {
     }
 
     @Test
-    public void findEndedAfter_shouldOnlyReturnPeriodsFromUser() throws Exception {
+    public void findEndedAfter_shouldOnlyReturnPeriodsFromUser() {
         // arrange
         User user1 = userTestService.createUser("user1");
         User user2 = userTestService.createUser("user2");

@@ -6,6 +6,7 @@ import com.lztimer.server.LztimerServerApplication;
 import com.lztimer.server.config.SocialProviders;
 import com.lztimer.server.repository.SocialUserConnectionRepository;
 import com.lztimer.server.security.StateProvider;
+import com.lztimer.server.util.DbTestUtil;
 import io.github.bonigarcia.wdm.ChromeDriverManager;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -19,9 +20,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.concurrent.TimeUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.hamcrest.Matchers.containsString;
@@ -64,21 +62,25 @@ public class DesktopSignInControllerIntTest {
     @Autowired
     private ConnectionFactoryLocator connectionFactoryLocator;
 
+    @Autowired
+    private DbTestUtil dbTestUtil;
+
     @BeforeClass
-    public static void setUpClass() throws Exception {
+    public static void setUpClass() {
         ChromeDriverManager.getInstance().setup();
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         WireMock.reset();
+        dbTestUtil.resetDb(); // for integration test @Transactional doesn't work, different Sessions
         setUpGoogleStub();
         setUpDesktopStub();
         setupNormal();
         createDriver();
     }
 
-    private void setUpGoogleStub() throws Exception {
+    private void setUpGoogleStub() {
         String clientId = "clientId";
         String secret = "secret";
         String token = "token123";
@@ -164,7 +166,7 @@ public class DesktopSignInControllerIntTest {
         }
     }
 
-    @Test @Transactional
+    @Test
     public void shouldReturnTokenWhenLoginWebsiteWasOpened() throws Exception {
         // given
 
@@ -182,8 +184,8 @@ public class DesktopSignInControllerIntTest {
                         .withRequestBody(containing("\"token\"")));
     }
 
-    @Test @Transactional
-    public void shouldReturnTokenWhenLoginWebsiteWasOpenedSecondTime() throws Exception {
+    @Test
+    public void shouldReturnTokenWhenLoginWebsiteWasOpenedSecondTime() {
         // given
         driver.get("http://localhost:8080/signin/desktop/google?port=" + desktopPort);
 
