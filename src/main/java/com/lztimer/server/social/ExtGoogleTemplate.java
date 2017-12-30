@@ -1,6 +1,5 @@
 package com.lztimer.server.social;
 
-import org.springframework.social.google.api.Google;
 import org.springframework.social.google.api.impl.GoogleTemplate;
 import org.springframework.social.google.api.oauth2.OAuth2Operations;
 

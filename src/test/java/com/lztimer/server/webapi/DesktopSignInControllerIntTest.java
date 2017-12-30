@@ -65,6 +65,9 @@ public class DesktopSignInControllerIntTest {
     @Autowired
     private DbTestUtil dbTestUtil;
 
+    @Autowired
+    private SocialProviders socialProviders;
+
     @BeforeClass
     public static void setUpClass() {
         ChromeDriverManager.getInstance().setup();
@@ -95,7 +98,7 @@ public class DesktopSignInControllerIntTest {
                 .withQueryParam("port", equalTo(String.valueOf(desktopPort)))
                 .withQueryParam("redirect_uri", equalTo(redirectUri))
                 .withQueryParam("response_type", equalTo("code"))
-                .withQueryParam("scope", equalTo(SocialProviders.getScope("google")))
+                .withQueryParam("scope", equalTo(socialProviders.getScope("google")))
                 .withQueryParam("state", equalTo(state))
                 .willReturn(aResponse()
                         .withStatus(302)
@@ -167,7 +170,7 @@ public class DesktopSignInControllerIntTest {
     }
 
     @Test
-    public void shouldReturnTokenWhenLoginWebsiteWasOpened() throws Exception {
+    public void shouldReturnTokenWhenLoginWebsiteWasOpened() {
         // given
 
         // when

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SocialProviders {
 
-    public static String getScope(String providerId) {
+    public String getScope(String providerId) {
         if (providerId.equals("google")) {
             return "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
         }

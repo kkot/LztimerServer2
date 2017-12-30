@@ -5,11 +5,9 @@ import com.lztimer.server.entity.User;
 import com.lztimer.server.repository.AuthorityRepository;
 import com.lztimer.server.repository.UserRepository;
 import com.lztimer.server.security.Authorities;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.connect.UserProfile;
@@ -30,22 +28,19 @@ public class SocialService {
 
     private final AuthorityRepository authorityRepository;
 
-    private final PasswordEncoder passwordEncoder;
-
     private final UserRepository userRepository;
 
     public SocialService(UsersConnectionRepository usersConnectionRepository, AuthorityRepository authorityRepository,
-                         PasswordEncoder passwordEncoder, UserRepository userRepository) {
+                         UserRepository userRepository) {
 
         this.usersConnectionRepository = usersConnectionRepository;
         this.authorityRepository = authorityRepository;
-        this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
     }
 
     public void deleteUserSocialConnection(String login) {
         ConnectionRepository connectionRepository = usersConnectionRepository.createConnectionRepository(login);
-        connectionRepository.findAllConnections().keySet().stream()
+        connectionRepository.findAllConnections().keySet()
                 .forEach(providerId -> {
                     connectionRepository.removeConnections(providerId);
                     log.debug("Delete user social connection providerId: {}", providerId);
@@ -88,7 +83,6 @@ public class SocialService {
         }
 
         String login = getLoginDependingOnProviderId(userProfile, providerId);
-        String encryptedPassword = passwordEncoder.encode(RandomStringUtils.random(10));
         Set<Authority> authorities = getAuthorities();
 
         User newUser = new User();

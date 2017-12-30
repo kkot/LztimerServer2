@@ -1,7 +1,6 @@
 package com.lztimer.server.webapi;
 
 import com.lztimer.server.entity.Period;
-import com.lztimer.server.repository.PeriodRepository;
 import com.lztimer.server.service.PeriodService;
 import com.lztimer.server.service.UserService;
 import com.lztimer.server.webapi.util.HeaderUtil;
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import static org.hibernate.id.IdentifierGenerator.ENTITY_NAME;
 
 @Slf4j
 @RestController

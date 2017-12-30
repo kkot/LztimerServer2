@@ -1,7 +1,6 @@
 package com.lztimer.server.util;
 
 import com.lztimer.server.entity.User;
-import com.lztimer.server.repository.UserRepository;
 import com.lztimer.server.service.AuthorityService;
 import com.lztimer.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

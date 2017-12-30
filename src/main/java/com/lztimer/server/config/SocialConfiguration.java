@@ -2,9 +2,7 @@ package com.lztimer.server.config;
 
 import com.lztimer.server.repository.CustomSocialUsersConnectionRepository;
 import com.lztimer.server.repository.SocialUserConnectionRepository;
-import com.lztimer.server.security.CustomSignInAdapter;
 import com.lztimer.server.security.StateProvider;
-import com.lztimer.server.security.TokenProvider;
 import com.lztimer.server.service.SocialService;
 import com.lztimer.server.social.ExtGoogleConnectionFactory;
 import com.lztimer.server.webapi.DesktopSignInController;
@@ -13,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.social.UserIdSource;
 import org.springframework.social.config.annotation.ConnectionFactoryConfigurer;
 import org.springframework.social.config.annotation.EnableSocial;

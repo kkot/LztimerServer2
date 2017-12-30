@@ -1,10 +1,8 @@
 package com.lztimer.server.repository;
 
 import com.lztimer.server.LztimerServerApplication;
-import com.lztimer.server.entity.Authority;
 import com.lztimer.server.entity.Period;
 import com.lztimer.server.entity.User;
-import com.lztimer.server.security.Authorities;
 import com.lztimer.server.service.AuthorityService;
 import com.lztimer.server.util.MovingClock;
 import com.lztimer.server.util.UserTestService;
@@ -21,7 +19,6 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 /**
  * Integration test for {@link PeriodRepository}.
