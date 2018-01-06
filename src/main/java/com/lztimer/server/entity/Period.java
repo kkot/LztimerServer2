@@ -15,7 +15,7 @@ import java.time.Instant;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "period")
+@Table(name = "lz_period")
 public class Period implements Serializable {
     private static final long serialVersionUID = 1L;
 

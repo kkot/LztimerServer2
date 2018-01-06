@@ -18,7 +18,7 @@ import java.io.Serializable;
 @Setter @Getter
 @EqualsAndHashCode @ToString
 @Entity
-@Table(name = "jhi_authority")
+@Table(name = "lz_authority")
 public class Authority implements Serializable {
     public static final long serialVersionUID = 1L;
 

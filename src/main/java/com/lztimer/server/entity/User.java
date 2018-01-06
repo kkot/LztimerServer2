@@ -19,7 +19,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "jhi_user")
+@Table(name = "lz_user")
 public class User extends AbstractAuditingEntity implements Serializable {
 
     @Id

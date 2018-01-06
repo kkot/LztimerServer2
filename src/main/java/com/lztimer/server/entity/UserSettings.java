@@ -14,7 +14,7 @@ import java.util.Objects;
  */
 @Entity
 @Setter @Getter
-@Table(name = "user_settings")
+@Table(name = "lz_user_settings")
 public class UserSettings implements Serializable {
 
     private static final long serialVersionUID = 1L;
