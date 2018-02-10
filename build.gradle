@@ -46,7 +46,7 @@ dependencies {
     compile('com.github.spring-social:spring-social-google:latest.release')
 
     compile('io.jsonwebtoken:jjwt:0.7.0')
-    //compile('org.springframework.social:spring-social-security:1.1.4.RELEASE')
+    compile('org.springframework.social:spring-social-security:1.1.4.RELEASE')
     compile 'org.springframework.social:spring-social-core:2.0.0.M4'
     compile('org.springframework.security:spring-security-data:4.2.2.RELEASE')
 
