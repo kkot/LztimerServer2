@@ -26,6 +26,9 @@
         dataType: "json",
         success: function (data) {
             alert(data)
+        },
+        error: function(jqXHR, textStatus,  errorThrown) {
+            console.info(jqXHR + " " + textStatus + " " + errorThrown);
         }
     });
     console.info("Callback on localhost:"+port);
