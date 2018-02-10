@@ -1,6 +1,7 @@
 buildscript {
     ext {
         springBootVersion = '2.0.0.RC1'
+        seleniumVersion = '3.9.1'
     }
     repositories {
         mavenCentral()
@@ -45,7 +46,8 @@ dependencies {
     compile('com.github.spring-social:spring-social-google:latest.release')
 
     compile('io.jsonwebtoken:jjwt:0.7.0')
-    compile('org.springframework.social:spring-social-security:1.1.4.RELEASE')
+    //compile('org.springframework.social:spring-social-security:1.1.4.RELEASE')
+    compile 'org.springframework.social:spring-social-core:2.0.0.M4'
     compile('org.springframework.security:spring-security-data:4.2.2.RELEASE')
 
     compile('mysql:mysql-connector-java')
@@ -58,10 +60,10 @@ dependencies {
     testCompile('org.projectlombok:lombok')
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile('io.github.bonigarcia:webdrivermanager:1.7.2')
+    testCompile('io.github.bonigarcia:webdrivermanager:2.1.0')
     testCompile "com.github.tomakehurst:wiremock:2.12.0"
 
-    testCompile('org.seleniumhq.selenium:selenium-api:3.7.1')
-    testCompile('org.seleniumhq.selenium:selenium-remote-driver:3.7.1')
-    testCompile('org.seleniumhq.selenium:selenium-server:3.7.1')
+    testCompile("org.seleniumhq.selenium:selenium-api:$seleniumVersion")
+    testCompile("org.seleniumhq.selenium:selenium-remote-driver:$seleniumVersion")
+    testCompile("org.seleniumhq.selenium:selenium-server:$seleniumVersion")
 }
