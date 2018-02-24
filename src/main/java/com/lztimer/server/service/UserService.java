@@ -33,37 +33,18 @@ public class UserService {
 
     private final SecurityService securityService;
 
-    public User createUser(String login, String firstName, String lastName, String email,
-                           String imageUrl, String langKey) {
+    public User createUser(String login) {
         User newUser = new User();
         newUser.setLogin(login);
-        newUser.setFirstName(firstName);
-        newUser.setLastName(lastName);
-        newUser.setEmail(email);
-        newUser.setImageUrl(imageUrl);
-        newUser.setLangKey(langKey);
-        newUser.setAuthorities(new HashSet<>(Arrays.asList(authorityRepository.getOne(Authorities.USER.getName()))));
+        newUser.setAuthorities(new HashSet<>(Arrays.asList(getUserAuthority())));
         userRepository.save(newUser);
         log.debug("Created Information for User: {}", newUser);
         return newUser;
     }
 
-    /**
-     * Update basic information (first name, last name, email, language) for the current user.
-     *
-     * @param firstName first name of user
-     * @param lastName  last name of user
-     * @param email     email id of user
-     */
-    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
-        userRepository.findOneByLogin(securityService.getCurrentUserLogin()).ifPresent(user -> {
-            user.setFirstName(firstName);
-            user.setLastName(lastName);
-            user.setEmail(email);
-            user.setLangKey(langKey);
-            user.setImageUrl(imageUrl);
-            log.debug("Changed Information for User: {}", user);
-        });
+    Authority getUserAuthority() {
+        return authorityRepository.findById(Authorities.USER.getName())
+                .orElse(authorityRepository.save(new Authority(Authorities.USER.getName())));
     }
 
     @Transactional(readOnly = true)

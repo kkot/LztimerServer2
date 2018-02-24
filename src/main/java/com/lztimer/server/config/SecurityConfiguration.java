@@ -1,6 +1,8 @@
 package com.lztimer.server.config;
 
-import com.lztimer.server.security.*;
+import com.lztimer.server.security.Http401UnauthorizedEntryPoint;
+import com.lztimer.server.security.JWTConfigurer;
+import com.lztimer.server.security.TokenProvider;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,11 +13,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
 import javax.annotation.PostConstruct;
 
@@ -29,7 +31,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
 
     private final TokenProvider tokenProvider;
-
 
     public SecurityConfiguration(AuthenticationManagerBuilder authenticationManagerBuilder, UserDetailsService userDetailsService,
                                  TokenProvider tokenProvider) {
@@ -69,31 +70,37 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .exceptionHandling()
-            .authenticationEntryPoint(http401UnauthorizedEntryPoint())
-        .and()
-            .csrf()
-            .disable()
-            .headers()
-            .frameOptions()
-            .disable()
-        .and()
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
+//            .exceptionHandling()
+//            .authenticationEntryPoint(http401UnauthorizedEntryPoint())
+//        .and()
+//            .csrf()
+//            .disable()
+//            .headers()
+//            .frameOptions()
+//            .disable()
+//        .and()
+//            .sessionManagement()
+//            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//        .and()
             .authorizeRequests()
-            .antMatchers("/api/register").permitAll()
-            .antMatchers("/api/activate").permitAll()
-            .antMatchers("/api/authenticate").permitAll()
-            .antMatchers("/api/account/reset_password/init").permitAll()
-            .antMatchers("/api/account/reset_password/finish").permitAll()
-            .antMatchers("/api/profile-info").permitAll()
-            .antMatchers("/api/**").authenticated()
-            .antMatchers("/management/health").permitAll()
-            .antMatchers("/management/**").hasAuthority(Authorities.ADMIN.getName())
-            .antMatchers("/v2/api-docs/**").permitAll()
-            .antMatchers("/swagger-resources/configuration/ui").permitAll()
-            .antMatchers("/swagger-ui/index.html").hasAuthority(Authorities.ADMIN.getName())
+                .antMatchers("/desktop/log_in").permitAll()
+                .anyRequest().authenticated()
+//            .antMatchers("/login").permitAll()
+//            .antMatchers("/api/register").permitAll()
+//            .antMatchers("/api/activate").permitAll()
+//            .antMatchers("/api/authenticate").permitAll()
+//            .antMatchers("/api/account/reset_password/init").permitAll()
+//            .antMatchers("/api/account/reset_password/finish").permitAll()
+//            .antMatchers("/api/profile-info").permitAll()
+//            .antMatchers("/api/**").authenticated()
+//            .antMatchers("/management/health").permitAll()
+//            .antMatchers("/management/**").hasAuthority(Authorities.ADMIN.getName())
+//            .antMatchers("/v2/api-docs/**").permitAll()
+//            .antMatchers("/swagger-resources/configuration/ui").permitAll()
+//            .antMatchers("/swagger-ui/index.html").hasAuthority(Authorities.ADMIN.getName())
+        .and()
+            .oauth2Login()
+            .successHandler(new SimpleUrlAuthenticationSuccessHandler("/desktop/logged_in"))
         .and()
             .apply(securityConfigurerAdapter());
 
@@ -112,24 +119,4 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public Http401UnauthorizedEntryPoint http401UnauthorizedEntryPoint() {
         return new Http401UnauthorizedEntryPoint();
     }
-
-    //@Bean
-//    public RestTemplate k8sRestTemplate() throws URISyntaxException {
-//
-//        RestTemplate restTemplate = new RestTemplate();
-//       URL certUrl = Resources.getResource("ssl/cert.pem");
-//        Path caCertFile = Paths.get(certUrl.toURI());
-//
-//        if (Files.exists(caCertFile) && Files.isRegularFile(caCertFile)) {
-//            SSLContext sslContext = SslUtils.createSslContextFromCertFile(caCertFile);
-//            CloseableHttpClient httpsClient = HttpClients.custom().useSystemProperties().setSSLContext(sslContext).build();
-//            restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(httpsClient));
-//
-//        } else {
-//            //LOGGER.warn("Certificate file {} is not found, Kubernetes api client will not be configured to use HTTPS protocol.", caCertFile.toString());
-//            restTemplate.setRequestFactory(new SimpleClientHttpRequestFactory());
-//        }
-//
-//        return restTemplate;
-//    }
 }

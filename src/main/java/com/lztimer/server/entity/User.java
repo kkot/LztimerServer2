@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -33,27 +32,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(length = 100, unique = true, nullable = false)
     private String login;
 
-    @Size(max = 50)
-    @Column(name = "first_name", length = 50)
-    String firstName;
-
-    @Size(max = 50)
-    @Column(name = "last_name", length = 50)
-    String lastName;
-
-    @Email
-    @Size(min = 5, max = 100)
-    @Column(length = 100, unique = true)
-    String email;
-
-    @Size(min = 2, max = 5)
-    @Column(name = "lang_key", length = 5)
-    String langKey;
-
-    @Size(max = 256)
-    @Column(name = "image_url", length = 256)
-    String imageUrl;
-
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -70,9 +48,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         User user = (User) o;
-
         return login.equals(user.login);
     }
 
@@ -85,11 +61,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
     public String toString() {
         return "User{" +
                 "login='" + login + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", imageUrl='" + imageUrl + '\'' +
-                ", langKey='" + langKey + '\'' +
                 "}";
     }
 }
