@@ -4,6 +4,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationToken;
 
 /**
  * Utility class for Spring Security.
@@ -11,6 +13,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 public final class SecurityUtils {
 
     private SecurityUtils() {
+    }
+
+    public static String getEmail(OAuth2AuthenticationToken token) {
+        return String.valueOf(token.getPrincipal().getAttributes().get("email"));
     }
 
     /**
@@ -21,6 +27,13 @@ public final class SecurityUtils {
     public static String getCurrentUserLogin() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
+        String email;
+        if (authentication instanceof OAuth2LoginAuthenticationToken) {
+            email = SecurityUtils.getEmail((OAuth2AuthenticationToken) authentication);
+        } else {
+            email = authentication.getName();
+
+        }
         String userName = null;
         if (authentication != null) {
             if (authentication.getPrincipal() instanceof UserDetails) {

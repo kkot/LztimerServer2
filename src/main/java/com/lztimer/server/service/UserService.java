@@ -12,10 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -33,9 +30,9 @@ public class UserService {
 
     private final SecurityService securityService;
 
-    public User createUser(String login) {
+    public User createUser(String email) {
         User newUser = new User();
-        newUser.setLogin(login);
+        newUser.setEmail(email);
         newUser.setAuthorities(new HashSet<>(Arrays.asList(getUserAuthority())));
         userRepository.save(newUser);
         log.debug("Created Information for User: {}", newUser);
@@ -48,18 +45,19 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<User> getUserWithAuthoritiesByLogin(String login) {
-        return userRepository.findOneWithAuthoritiesByLogin(login);
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findOneWithAuthoritiesByEmail(email);
     }
 
     @Transactional(readOnly = true)
-    public User getUserWithAuthorities(Long id) {
-        return userRepository.findOneWithAuthoritiesById(id);
+    public User getLoggedUserDesktop() {
+        return userRepository.findOneWithAuthoritiesByUuid(UUID.fromString(securityService.getLoggedUserId()))
+                .orElseThrow(IllegalStateException::new);
     }
 
     @Transactional(readOnly = true)
-    public User getUserWithAuthorities() {
-        return userRepository.findOneWithAuthoritiesByLogin(securityService.getCurrentUserLogin()).orElse(null);
+    public Optional<User> getLoggedUserWeb() {
+        return userRepository.findOneWithAuthoritiesByEmail(securityService.getLoggedUserEmail());
     }
 
     /**

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Spring Data JPA repository for the Period entity.
@@ -16,7 +17,7 @@ import java.util.List;
 @Repository
 public interface PeriodRepository extends JpaRepository<Period, Long> {
 
-    @Query("select period from Period period where period.owner.login = ?#{principal.username}")
+    @Query("select period from Period period where period.owner.uuid = ?#{principal.username}")
     List<Period> findByOwnerIsCurrentUser();
 
     @Modifying
@@ -24,21 +25,21 @@ public interface PeriodRepository extends JpaRepository<Period, Long> {
             "where id in " +
             "(select period.id " +
             "   from Period period " +
-            "   where period.owner.login = ?1 " +
+            "   where period.owner.uuid = ?1 " +
             "     and period.beginTime >= ?2 and period.endTime <= ?3)")
-    int deleteFromInterval(String userLogin, Instant startDate, Instant endDate);
+    int deleteFromInterval(UUID userId, Instant startDate, Instant endDate);
 
     @Modifying
     @Query("select period from Period period " +
-            " where period.owner.login = ?1 " +
+            " where period.owner.uuid = ?1 " +
             " and " +
             "  (period.beginTime between ?2 and ?3 " +
             "   or period.endTime between ?2 and ?3" +
             "  )")
-    List<Period> findPeriodsIntersectingInterval(String userLogin, Instant startDate, Instant endDate);
+    List<Period> findPeriodsIntersectingInterval(UUID userId, Instant startDate, Instant endDate);
 
     @Query("select period from Period period " +
-            "where period.owner.login = ?1 " +
+            "where period.owner.id = ?1 " +
             "and period.endTime >= ?2")
-    List<Period> findEndedAfter(String userLogin, Instant dateTime);
+    List<Period> findEndedAfter(UUID userId, Instant dateTime);
 }

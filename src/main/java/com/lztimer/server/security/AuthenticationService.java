@@ -1,11 +1,13 @@
 package com.lztimer.server.security;
 
+import com.lztimer.server.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+
+import java.util.stream.Collectors;
 
 /**
  * TODO:
@@ -16,12 +18,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private final UserDetailsService userDetailsService;
-
-    public UsernamePasswordAuthenticationToken authenticate(String userId) {
-        UserDetails user = userDetailsService.loadUserByUsername(userId);
+    public UsernamePasswordAuthenticationToken authenticate(User user) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                user, null, user.getAuthorities());
+                user.getUuid(), null,
+                user.getAuthorities().stream().map(auth -> new SimpleGrantedAuthority(auth.getName())).collect(Collectors.toList()));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         return authenticationToken;
     }

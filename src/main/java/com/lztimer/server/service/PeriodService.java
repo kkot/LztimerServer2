@@ -36,7 +36,7 @@ public class PeriodService {
      */
     public Period save(Period period) {
         log.debug("Request to save Period : {}", period);
-        period.setOwner(userService.getUserWithAuthorities());
+        period.setOwner(userService.getLoggedUserDesktop());
         return periodRepository.save(period);
     }
 
@@ -44,9 +44,9 @@ public class PeriodService {
      * Adds {@code period} and deletes old period that are inside new period.
      */
     public Period addAndReplace(Period period) {
-        User user = userService.getUserWithAuthorities();
-        int deleted = periodRepository.deleteFromInterval(user.getLogin(), period.getBeginTime(), period.getEndTime());
-        List<Period> intersectingInterval = periodRepository.findPeriodsIntersectingInterval(user.getLogin(),
+        User user = userService.getLoggedUserDesktop();
+        int deleted = periodRepository.deleteFromInterval(user.getUuid(), period.getBeginTime(), period.getEndTime());
+        List<Period> intersectingInterval = periodRepository.findPeriodsIntersectingInterval(user.getUuid(),
                 period.getBeginTime(), period.getEndTime());
         if (!intersectingInterval.isEmpty()) {
             reportIncorrectPeriodUpdater(intersectingInterval);

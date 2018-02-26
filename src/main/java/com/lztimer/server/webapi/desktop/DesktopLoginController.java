@@ -1,11 +1,14 @@
 package com.lztimer.server.webapi.desktop;
 
 import com.lztimer.server.entity.User;
+import com.lztimer.server.security.SecurityUtils;
 import com.lztimer.server.security.TokenProvider;
 import com.lztimer.server.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,15 +43,22 @@ public class DesktopLoginController {
 
     @GetMapping("/logged_in")
     public ModelAndView loggedIn(Authentication authentication, ServletWebRequest servletWebRequest, HttpSession session) {
-        Optional<User> userOpt = userService.getUserWithAuthoritiesByLogin(authentication.getName());
+        if (authentication instanceof OAuth2LoginAuthenticationToken) {
+            throw new IllegalStateException("Not authenticated");
+        }
+        OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
+        String email = SecurityUtils.getEmail(token);
+        Optional<User> userOpt = userService.getUserByEmail(email);
+        User user;
         if (!userOpt.isPresent()) {
             log.info("Creating user from authentication {}", authentication);
-            User user = userService.createUser(authentication.getName());
+            user = userService.createUser(email);
             log.info("Created user {}", user);
         } else {
-            log.info("Creating user {}", userOpt.get());
+            user = userOpt.get();
+            log.info("User existed {}", user);
         }
-        String jwt = tokenProvider.createToken(authentication, false);
+        String jwt = tokenProvider.createToken(user.getUuid(), authentication, true);
         servletWebRequest.getResponse().addCookie(createSocialAuthenticationCookie(jwt));
         servletWebRequest.getResponse().addCookie(createCookie("port", String.valueOf(getPortFromSession(session))));
         return new ModelAndView("/signin_completed.html");

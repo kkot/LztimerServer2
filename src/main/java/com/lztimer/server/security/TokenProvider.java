@@ -15,6 +15,7 @@ import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -46,7 +47,7 @@ public class TokenProvider {
             1000 * configProperties.getToken().getTokenValidityInSecondsForRememberMe();
     }
 
-    public String createToken(Authentication authentication, Boolean rememberMe) {
+    public String createToken(UUID uuid, Authentication authentication, Boolean rememberMe) {
         String authorities = authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.joining(","));
@@ -60,7 +61,7 @@ public class TokenProvider {
         }
 
         return Jwts.builder()
-            .setSubject(authentication.getName())
+            .setSubject(uuid.toString())
             .claim(AUTHORITIES_KEY, authorities)
             .signWith(SignatureAlgorithm.HS512, secretKey)
             .setExpiration(validity)

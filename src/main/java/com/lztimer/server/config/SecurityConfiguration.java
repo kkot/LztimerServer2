@@ -3,57 +3,26 @@ package com.lztimer.server.config;
 import com.lztimer.server.security.Http401UnauthorizedEntryPoint;
 import com.lztimer.server.security.JWTConfigurer;
 import com.lztimer.server.security.TokenProvider;
-import org.springframework.beans.factory.BeanInitializationException;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
-import javax.annotation.PostConstruct;
-
+@AllArgsConstructor
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
-    private final UserDetailsService userDetailsService;
-
     private final TokenProvider tokenProvider;
 
-    public SecurityConfiguration(AuthenticationManagerBuilder authenticationManagerBuilder, UserDetailsService userDetailsService,
-                                 TokenProvider tokenProvider) {
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.userDetailsService = userDetailsService;
-        this.tokenProvider = tokenProvider;
-    }
-
-    @PostConstruct
-    public void init() {
-        try {
-            authenticationManagerBuilder
-                .userDetailsService(userDetailsService)
-                    .passwordEncoder(passwordEncoder());
-        } catch (Exception e) {
-            throw new BeanInitializationException("Security configuration failed", e);
-        }
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    private final RedirectingAuthenticationSuccessHandler authenticationSuccessHandler;
 
     @Override
     public void configure(WebSecurity web) {
@@ -100,7 +69,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 //            .antMatchers("/swagger-ui/index.html").hasAuthority(Authorities.ADMIN.getName())
         .and()
             .oauth2Login()
-            .successHandler(new SimpleUrlAuthenticationSuccessHandler("/desktop/logged_in"))
+            .successHandler(authenticationSuccessHandler)
         .and()
             .apply(securityConfigurerAdapter());
 

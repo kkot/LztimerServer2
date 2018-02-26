@@ -42,7 +42,7 @@ public class PeriodController {
         if (period.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new period cannot already have an ID")).body(null);
         }
-        period.setOwner(userService.getUserWithAuthorities());
+        period.setOwner(userService.getLoggedUserDesktop());
         Period result = periodService.addAndReplace(period);
         return ResponseEntity.created(new URI("/api/periods/" + result.getId()))
                 .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
