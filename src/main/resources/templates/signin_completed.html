@@ -18,10 +18,11 @@
     let port = getCookie("port");
     let token = getCookie("social-authentication");
     let targetUrl = "http://localhost:" + port;
+    let tokenJson = JSON.stringify({"token": token });
     $.ajax({
         url: targetUrl,
         type: "POST",
-        data: JSON.stringify({"token": token }),
+        data: tokenJson,
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (data) {

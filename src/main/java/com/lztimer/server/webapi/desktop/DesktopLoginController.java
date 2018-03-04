@@ -61,7 +61,7 @@ public class DesktopLoginController {
         String jwt = tokenProvider.createToken(user.getUuid(), authentication, true);
         servletWebRequest.getResponse().addCookie(createSocialAuthenticationCookie(jwt));
         servletWebRequest.getResponse().addCookie(createCookie("port", String.valueOf(getPortFromSession(session))));
-        return new ModelAndView("/signin_completed.html");
+        return new ModelAndView("signin_completed");
     }
 
     private Cookie createSocialAuthenticationCookie(String token) {
