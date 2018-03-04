@@ -5,7 +5,6 @@ import com.lztimer.server.entity.User;
 import com.lztimer.server.repository.AuthorityRepository;
 import com.lztimer.server.repository.UserRepository;
 import com.lztimer.server.security.Authorities;
-import com.lztimer.server.security.SecurityService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +27,6 @@ public class UserService {
 
     private final AuthorityRepository authorityRepository;
 
-    private final SecurityService securityService;
-
     public User createUser(String email) {
         User newUser = new User();
         newUser.setEmail(email);
@@ -49,21 +46,14 @@ public class UserService {
         return userRepository.findOneWithAuthoritiesByEmail(email);
     }
 
-    @Transactional(readOnly = true)
-    public User getLoggedUserDesktop() {
-        return userRepository.findOneWithAuthoritiesByUuid(UUID.fromString(securityService.getLoggedUserId()))
-                .orElseThrow(IllegalStateException::new);
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<User> getLoggedUserWeb() {
-        return userRepository.findOneWithAuthoritiesByEmail(securityService.getLoggedUserEmail());
-    }
-
     /**
      * @return a list of all the authorities
      */
     public List<String> authorities() {
         return authorityRepository.findAll().stream().map(Authority::getName).collect(Collectors.toList());
+    }
+
+    public Optional<User> getUserByUuid(UUID uuid) {
+        return userRepository.findOneWithAuthoritiesByUuid(uuid);
     }
 }

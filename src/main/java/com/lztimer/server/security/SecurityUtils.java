@@ -1,11 +1,13 @@
 package com.lztimer.server.security;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationToken;
+
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Utility class for Spring Security.
@@ -24,26 +26,22 @@ public final class SecurityUtils {
      *
      * @return the login of the current user
      */
-    public static String getCurrentUserLogin() {
+    public static Optional<UUID> getLoggedUserUuid() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
-        String email;
-        if (authentication instanceof OAuth2LoginAuthenticationToken) {
-            email = SecurityUtils.getEmail((OAuth2AuthenticationToken) authentication);
-        } else {
-            email = authentication.getName();
+        if (authentication instanceof UsernamePasswordAuthenticationToken) {
+            return Optional.of(UUID.fromString(authentication.getName()));
+        }
+        return Optional.empty();
+    }
 
+    public static Optional<String> getLoggedUserEmail() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = securityContext.getAuthentication();
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            return Optional.of(getEmail((OAuth2AuthenticationToken) authentication));
         }
-        String userName = null;
-        if (authentication != null) {
-            if (authentication.getPrincipal() instanceof UserDetails) {
-                UserDetails springSecurityUser = (UserDetails) authentication.getPrincipal();
-                userName = springSecurityUser.getUsername();
-            } else if (authentication.getPrincipal() instanceof String) {
-                userName = (String) authentication.getPrincipal();
-            }
-        }
-        return userName;
+        return Optional.empty();
     }
 
     /**

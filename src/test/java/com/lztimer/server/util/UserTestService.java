@@ -23,12 +23,11 @@ public class UserTestService {
     /**
      * Creates and saves new user with login given as argument.
      *
-     * @param login user login
+     * @param email email
      * @return new user
      */
-    public User createUser(String login) {
+    public User createUser(String email) {
         authorityService.addStandard();
-        return userService.createUser(login, "John", "Doe",
-                login + "@localhost", "http://placehold.it/50x50", "en-US");
+        return userService.createUser(email);
     }
 }

@@ -60,7 +60,7 @@ public class PeriodRepositoryIntTest {
         periodRepositoryUnderTest.save(afterPeriod);
 
         // act
-        List<Period> periodsAfter = periodRepositoryUnderTest.findEndedAfter(user.getLogin(), thresholdDate);
+        List<Period> periodsAfter = periodRepositoryUnderTest.findEndedAfter(user.getUuid(), thresholdDate);
 
         // assert
         assertThat(periodsAfter, contains(afterPeriod));
@@ -79,8 +79,8 @@ public class PeriodRepositoryIntTest {
         periodRepositoryUnderTest.save(period2);
 
         // act
-        List<Period> periodsUser1 = periodRepositoryUnderTest.findEndedAfter(user1.getLogin(), thresholdDate);
-        List<Period> periodsUser2 = periodRepositoryUnderTest.findEndedAfter(user2.getLogin(), thresholdDate);
+        List<Period> periodsUser1 = periodRepositoryUnderTest.findEndedAfter(user1.getUuid(), thresholdDate);
+        List<Period> periodsUser2 = periodRepositoryUnderTest.findEndedAfter(user2.getUuid(), thresholdDate);
 
         // assert
         assertThat(periodsUser1, contains(period1));

@@ -1,6 +1,7 @@
 package com.lztimer.server.webapi;
 
 import com.lztimer.server.entity.Period;
+import com.lztimer.server.security.SecurityService;
 import com.lztimer.server.service.PeriodService;
 import com.lztimer.server.service.UserService;
 import com.lztimer.server.webapi.util.HeaderUtil;
@@ -29,6 +30,9 @@ public class PeriodController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private SecurityService securityService;
+
     /**
      * POST  /periods : Create a new period.
      *
@@ -42,7 +46,7 @@ public class PeriodController {
         if (period.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new period cannot already have an ID")).body(null);
         }
-        period.setOwner(userService.getLoggedUserDesktop());
+        period.setOwner(securityService.getLoggedUser());
         Period result = periodService.addAndReplace(period);
         return ResponseEntity.created(new URI("/api/periods/" + result.getId()))
                 .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))

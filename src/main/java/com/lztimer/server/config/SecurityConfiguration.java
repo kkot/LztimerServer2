@@ -41,9 +41,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
 //            .exceptionHandling()
 //            .authenticationEntryPoint(http401UnauthorizedEntryPoint())
-//        .and()
-//            .csrf()
-//            .disable()
+            .csrf()
+            .disable()
 //            .headers()
 //            .frameOptions()
 //            .disable()

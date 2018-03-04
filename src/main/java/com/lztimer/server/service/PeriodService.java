@@ -3,6 +3,7 @@ package com.lztimer.server.service;
 import com.lztimer.server.entity.Period;
 import com.lztimer.server.entity.User;
 import com.lztimer.server.repository.PeriodRepository;
+import com.lztimer.server.security.SecurityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,12 +21,12 @@ public class PeriodService {
 
     private final PeriodRepository periodRepository;
 
-    private final UserService userService;
+    private final SecurityService securityService;
 
     @Autowired
-    public PeriodService(PeriodRepository periodRepository, UserService userService) {
+    public PeriodService(PeriodRepository periodRepository, SecurityService securityService) {
         this.periodRepository = periodRepository;
-        this.userService = userService;
+        this.securityService = securityService;
     }
 
     /**
@@ -36,7 +37,7 @@ public class PeriodService {
      */
     public Period save(Period period) {
         log.debug("Request to save Period : {}", period);
-        period.setOwner(userService.getLoggedUserDesktop());
+        period.setOwner(securityService.getLoggedUser());
         return periodRepository.save(period);
     }
 
@@ -44,7 +45,7 @@ public class PeriodService {
      * Adds {@code period} and deletes old period that are inside new period.
      */
     public Period addAndReplace(Period period) {
-        User user = userService.getLoggedUserDesktop();
+        User user = securityService.getLoggedUser();
         int deleted = periodRepository.deleteFromInterval(user.getUuid(), period.getBeginTime(), period.getEndTime());
         List<Period> intersectingInterval = periodRepository.findPeriodsIntersectingInterval(user.getUuid(),
                 period.getBeginTime(), period.getEndTime());

@@ -2,6 +2,7 @@ package com.lztimer.server.security;
 
 import com.lztimer.server.LztimerServerApplication;
 import com.lztimer.server.entity.Period;
+import com.lztimer.server.entity.User;
 import com.lztimer.server.repository.PeriodRepository;
 import com.lztimer.server.service.AuthorityService;
 import com.lztimer.server.service.UserService;
@@ -18,11 +19,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -70,11 +73,12 @@ public class JWTFilterIntTest {
     public void shouldCreateNewPeriodWithCorrectUser_whenJWTTokenIsProvided() {
         // given
         authorityService.addStandard();
-        userService.createUser(TEST_USER_LOGIN, "x", "X", "X@a.pl", "", "pl");
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                TEST_USER_LOGIN, null, Arrays.asList(Authorities.USER.toGrantedAuthority())
+        User user = userService.createUser("email@email.com");
+        UUID uuid = user.getUuid();
+        Authentication authenticationToken = new UsernamePasswordAuthenticationToken(
+                uuid, null, Arrays.asList(Authorities.USER.toGrantedAuthority())
         );
-        String jwtToken = tokenProvider.createToken(authenticationToken, false);
+        String jwtToken = tokenProvider.createToken(uuid, authenticationToken, false);
         Period period = new Period(Instant.now(), Instant.now().plusSeconds(1), true);
         HttpHeaders headers = new HttpHeaders();
         headers.add(JWTConfigurer.AUTHORIZATION_HEADER, JWTFilter.BEARER_PREFIX + jwtToken);
@@ -88,7 +92,7 @@ public class JWTFilterIntTest {
         assertThat(exchange.getStatusCode(), equalTo(HttpStatus.CREATED));
         List<Period> all = periodRepository.findAll();
         assertThat(all, hasSize(1));
-        assertThat(all.get(0).getOwner().getLogin(), equalTo(TEST_USER_LOGIN));
+        assertThat(all.get(0).getOwner().getUuid(), equalTo(uuid));
     }
 
     // TODO: test for wrong token, expired etc.

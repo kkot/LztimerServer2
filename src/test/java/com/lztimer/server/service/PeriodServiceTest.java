@@ -5,23 +5,26 @@ import com.lztimer.server.entity.Period;
 import com.lztimer.server.entity.User;
 import com.lztimer.server.repository.PeriodRepository;
 import com.lztimer.server.security.AuthenticationService;
+import com.lztimer.server.security.SecurityService;
 import com.lztimer.server.util.MovingClock;
 import com.lztimer.server.util.UserTestService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * TODO:
@@ -45,13 +48,21 @@ public class PeriodServiceTest {
     @Autowired
     AuthenticationService authenticationService;
 
+    @MockBean
+    SecurityService securityService;
+
     private MovingClock movingClock = new MovingClock();
+
+    @Before
+    public void setUp() throws Exception {
+        User user = userTestService.createUser("user");
+        when(securityService.getLoggedUser()).thenReturn(user);
+        when(securityService.getLoggedUserOpt()).thenReturn(Optional.of(user));
+    }
 
     @Test
     public void addAndReplace_shouldReplacePreviouslyExistingPeriod() {
         // given
-        User user = userTestService.createUser("user");
-        authenticationService.authenticate(user.getLogin());
         Period period1 = new Period(movingClock.getCurrent(), movingClock.shiftSeconds(1), false);
         Period period2 = new Period(movingClock.getCurrent(), movingClock.shiftSeconds(1), true);
         periodService.save(period1);
@@ -69,8 +80,6 @@ public class PeriodServiceTest {
     @Test
     public void addAndReplace_shouldReportErrorWhenThereArePeriodsPartiallyOutSideCurrent() {
         // given
-        User user = userTestService.createUser("user");
-        authenticationService.authenticate(user.getLogin());
         Instant now = Instant.now();
 
         Period period1 = new Period(now, now.plusSeconds(5), false);

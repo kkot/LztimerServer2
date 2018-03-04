@@ -1,7 +1,7 @@
 package com.lztimer.server.config;
 
-import com.lztimer.server.service.UserService;
-import lombok.AllArgsConstructor;
+import com.lztimer.server.security.SecurityService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -14,16 +14,17 @@ import javax.servlet.http.HttpServletResponse;
  * @author Krzysztof Kot (krzysztof.kot.pl@gmail.com)
  */
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RedirectingAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    private UserService userService;
+
+    private final SecurityService securityService;
 
     @Override
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response) {
         if (request.getRequestURI().contains("/login/oauth2/code/desktop_")) {
             return "/desktop/logged_in";
         }
-        if (!userService.getLoggedUserWeb().isPresent()) {
+        if (!securityService.getLoggedUserOpt().isPresent()) {
             return "/web/log_in";
         }
         return super.determineTargetUrl(request, response);
