@@ -47,6 +47,7 @@ dependencies {
     compile("org.springframework.security:spring-security-oauth2-jose")
 
     compile('io.jsonwebtoken:jjwt:0.7.0')
+    compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
 
 //    compile('org.springframework.social:spring-social-facebook:latest.release')
 //    compile('com.github.spring-social:spring-social-google:latest.release')
