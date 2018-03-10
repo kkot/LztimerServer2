@@ -4,78 +4,84 @@ import com.lztimer.server.security.Http401UnauthorizedEntryPoint;
 import com.lztimer.server.security.JWTConfigurer;
 import com.lztimer.server.security.TokenProvider;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 
-@AllArgsConstructor
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration {
 
-    private final TokenProvider tokenProvider;
+    @Order(1)
+    @Configuration
+    @RequiredArgsConstructor
+    class RestSecurity extends WebSecurityConfigurerAdapter {
 
-    private final RedirectingAuthenticationSuccessHandler authenticationSuccessHandler;
+        private final TokenProvider tokenProvider;
 
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring()
-            .antMatchers(HttpMethod.OPTIONS, "/**")
-            .antMatchers("/app/**/*.{js,html}")
-            .antMatchers("/i18n/**")
-            .antMatchers("/content/**")
-            .antMatchers("/swagger-ui/index.html")
-            .antMatchers("/test/**")
-            .antMatchers("/h2-console/**");
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http
+                    .csrf()
+                    .disable()
+                    .antMatcher("/api/*")
+                    .authorizeRequests().anyRequest().authenticated()
+                    .and()
+                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                    .apply(securityConfigurerAdapter());
+        }
+
+        private JWTConfigurer securityConfigurerAdapter() {
+            return new JWTConfigurer(tokenProvider);
+        }
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
+    @AllArgsConstructor
+    @Order(2)
+    @Configuration
+    public static class WebConfiguration extends WebSecurityConfigurerAdapter {
+
+        private final RedirectingAuthenticationSuccessHandler authenticationSuccessHandler;
+
+        @Override
+        public void configure(WebSecurity web) {
+            web.ignoring()
+                    .antMatchers(HttpMethod.OPTIONS, "/**")
+                    .antMatchers("/app/**/*.{js,html}")
+                    .antMatchers("/i18n/**")
+                    .antMatchers("/content/**")
+                    .antMatchers("/swagger-ui/index.html")
+                    .antMatchers("/test/**")
+                    .antMatchers("/h2-console/**");
+        }
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http
 //            .exceptionHandling()
 //            .authenticationEntryPoint(http401UnauthorizedEntryPoint())
-            .csrf()
-            .disable()
+                    .csrf()
+                    .disable()
 //            .headers()
 //            .frameOptions()
 //            .disable()
-//        .and()
-//            .sessionManagement()
-//            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//        .and()
-            .authorizeRequests()
-                .antMatchers("/desktop/log_in").permitAll()
-                .anyRequest().authenticated()
-//            .antMatchers("/login").permitAll()
-//            .antMatchers("/api/register").permitAll()
-//            .antMatchers("/api/activate").permitAll()
-//            .antMatchers("/api/authenticate").permitAll()
-//            .antMatchers("/api/account/reset_password/init").permitAll()
-//            .antMatchers("/api/account/reset_password/finish").permitAll()
-//            .antMatchers("/api/profile-info").permitAll()
-//            .antMatchers("/api/**").authenticated()
-//            .antMatchers("/management/health").permitAll()
-//            .antMatchers("/management/**").hasAuthority(Authorities.ADMIN.getName())
-//            .antMatchers("/v2/api-docs/**").permitAll()
-//            .antMatchers("/swagger-resources/configuration/ui").permitAll()
-//            .antMatchers("/swagger-ui/index.html").hasAuthority(Authorities.ADMIN.getName())
-        .and()
-            .oauth2Login()
-            .successHandler(authenticationSuccessHandler)
-        .and()
-            .apply(securityConfigurerAdapter());
+                    .authorizeRequests()
+                    .antMatchers("/desktop/log_in").permitAll()
+                    .anyRequest().authenticated()
+                    .and()
+                    .oauth2Login()
+                    .successHandler(authenticationSuccessHandler);
 
-    }
-
-    private JWTConfigurer securityConfigurerAdapter() {
-        return new JWTConfigurer(tokenProvider);
+        }
     }
 
     @Bean

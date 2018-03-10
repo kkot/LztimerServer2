@@ -1,12 +1,14 @@
 package com.lztimer.server.security;
 
 import com.lztimer.server.LztimerServerApplication;
+import com.lztimer.server.dto.PeriodList;
 import com.lztimer.server.entity.Period;
 import com.lztimer.server.entity.User;
 import com.lztimer.server.repository.PeriodRepository;
 import com.lztimer.server.service.AuthorityService;
 import com.lztimer.server.service.UserService;
 import com.lztimer.server.util.DbTestUtil;
+import lombok.experimental.var;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -75,14 +77,15 @@ public class JWTFilterIntTest {
         authorityService.addStandard();
         User user = userService.createUser("email@email.com");
         UUID uuid = user.getUuid();
-        Authentication authenticationToken = new UsernamePasswordAuthenticationToken(
+        var authenticationToken = new UsernamePasswordAuthenticationToken(
                 uuid, null, Arrays.asList(Authorities.USER.toGrantedAuthority())
         );
         String jwtToken = tokenProvider.createToken(uuid, authenticationToken, false);
-        Period period = new Period(Instant.now(), Instant.now().plusSeconds(1), true);
+        var period = new Period(Instant.now(), Instant.now().plusSeconds(1), true);
+        var periodList = PeriodList.builder().period(period).build();
         HttpHeaders headers = new HttpHeaders();
         headers.add(JWTConfigurer.AUTHORIZATION_HEADER, JWTFilter.BEARER_PREFIX + jwtToken);
-        HttpEntity<Period> periodEntity = new HttpEntity<>(period, headers);
+        HttpEntity<PeriodList> periodEntity = new HttpEntity<>(periodList, headers);
 
         // when
         ResponseEntity<String> exchange = restTemplate.postForEntity("http://localhost:" + port + "/api/periods",
