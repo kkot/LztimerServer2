@@ -50,13 +50,13 @@ public class PeriodService {
         List<Period> intersectingInterval = periodRepository.findPeriodsIntersectingInterval(user.getUuid(),
                 period.getBeginTime(), period.getEndTime());
         if (!intersectingInterval.isEmpty()) {
-            reportIncorrectPeriodUpdater(intersectingInterval);
+            reportIncorrectPeriodUpdater(period, intersectingInterval);
         }
         log.debug("deleted periods {}", deleted);
         return save(period);
     }
 
-    void reportIncorrectPeriodUpdater(List<Period> intersectingInterval) {
-        log.error("updating previous periods is incorrect {}", intersectingInterval);
+    void reportIncorrectPeriodUpdater(Period period, List<Period> intersectingInterval) {
+        log.error("current period {}, old intersecting intervals {}", period, intersectingInterval);
     }
 }

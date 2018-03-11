@@ -30,6 +30,10 @@ public class SecurityConfiguration {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
+                    .headers()
+                    .frameOptions()
+                    .disable()
+                    .and()
                     .csrf()
                     .disable()
                     .antMatcher("/api/*")

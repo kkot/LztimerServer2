@@ -33,9 +33,8 @@ public interface PeriodRepository extends JpaRepository<Period, Long> {
     @Query("select period from Period period " +
             " where period.owner.uuid = ?1 " +
             " and " +
-            "  (period.beginTime between ?2 and ?3 " +
-            "   or period.endTime between ?2 and ?3" +
-            "  )")
+            "   (period.beginTime > ?2 and period.beginTime < ?3) or " +
+            "   (period.endTime   > ?2 and period.beginTime < ?3) ")
     List<Period> findPeriodsIntersectingInterval(UUID userId, Instant startDate, Instant endDate);
 
     @Query("select period from Period period " +

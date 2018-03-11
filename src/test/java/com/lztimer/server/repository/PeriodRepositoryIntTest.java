@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -87,4 +87,51 @@ public class PeriodRepositoryIntTest {
         assertThat(periodsUser2, contains(period2));
     }
 
+    @Test
+    public void findPeriodsIntersectingInterval_shouldNotReturningTouching() {
+        // given
+        User user1 = userTestService.createUser("user1");
+
+        Instant thresholdDate = clock.getCurrent();
+        Period period = new Period(clock.getCurrent(), clock.shiftSeconds(1), false, user1);
+
+        periodRepositoryUnderTest.save(period);
+
+        // when
+        List<Period> intersectingIntervalsBefore = periodRepositoryUnderTest.findPeriodsIntersectingInterval(
+                user1.getUuid(), period.getBeginTime().minusSeconds(1), period.getBeginTime());
+
+        List<Period> intersectingIntervalsAfter = periodRepositoryUnderTest.findPeriodsIntersectingInterval(
+                user1.getUuid(), period.getEndTime(), period.getEndTime().plusSeconds(1));
+
+        // assert
+        assertThat(intersectingIntervalsAfter, empty());
+        assertThat(intersectingIntervalsBefore, empty());
+    }
+
+    @Test
+    public void findPeriodsIntersectingInterval_shouldReturningIncluding() {
+        // given
+        User user1 = userTestService.createUser("user1");
+
+        Instant thresholdDate = clock.getCurrent();
+        Period period = new Period(clock.getCurrent(), clock.shiftSeconds(1), false, user1);
+
+        periodRepositoryUnderTest.save(period);
+
+        // when
+        List<Period> intersectingIntervalsLeft = periodRepositoryUnderTest.findPeriodsIntersectingInterval(
+                user1.getUuid(), period.getBeginTime().minusSeconds(1), period.getBeginTime().plusMillis(1));
+
+        List<Period> intersectingIntervalsRight = periodRepositoryUnderTest.findPeriodsIntersectingInterval(
+                user1.getUuid(), period.getEndTime().minusMillis(1), period.getEndTime().plusSeconds(1));
+
+        List<Period> intersectingIntervalsBigger = periodRepositoryUnderTest.findPeriodsIntersectingInterval(
+                user1.getUuid(), period.getBeginTime().minusMillis(1), period.getEndTime().plusMillis(1));
+
+        // assert
+        assertThat(intersectingIntervalsRight, not(empty()));
+        assertThat(intersectingIntervalsLeft, not(empty()));
+        assertThat(intersectingIntervalsBigger, not(empty()));
+    }
 }

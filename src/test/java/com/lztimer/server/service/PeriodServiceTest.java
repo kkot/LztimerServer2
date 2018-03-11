@@ -91,6 +91,6 @@ public class PeriodServiceTest {
 
         // then
         assertThat(periodRepository.findAll(), contains(period1, period2));
-        verify(periodService, times(1)).reportIncorrectPeriodUpdater(any());
+        verify(periodService, times(1)).reportIncorrectPeriodUpdater(any(), any());
     }
 }
