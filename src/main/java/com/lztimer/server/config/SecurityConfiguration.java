@@ -65,7 +65,7 @@ public class SecurityConfiguration {
                     .antMatchers("/content/**")
                     .antMatchers("/swagger-ui/index.html")
                     .antMatchers("/test/**")
-                    .antMatchers("/h2-console/**");
+                    .antMatchers("/h2/**");
         }
 
         @Override

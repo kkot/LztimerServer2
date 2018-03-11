@@ -5,18 +5,12 @@
     <title>Title</title>
 </head>
 <body>
-<p th:text="'Hello, ' + ${user.email} + '!'" />
-
-<form action="/signin/google" method="post">
-    <input name="scope" type="hidden" value="https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"/>
-    <input type="submit" value="Sign In (Google)">
-</form>
-
-<form action="/signin/desktop/google" method="post">
-    <input name="scope" type="hidden" value="https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"/>
-    <input name="port" type="hidden" value="1234"/>
-    <input type="submit" value="Sign In Desktop (Google)">
-</form>
+<div>
+    <p th:text="'Hello, ' + ${user.email} + '!'"/>
+    <ul th:each="period : ${periods}">
+        <li th:text="${period}"></li>
+    </ul>
+</div>
 
 </body>
 </html>

@@ -17,9 +17,6 @@ import java.util.UUID;
 @Repository
 public interface PeriodRepository extends JpaRepository<Period, Long> {
 
-    @Query("select period from Period period where period.owner.uuid = ?#{principal.username}")
-    List<Period> findByOwnerIsCurrentUser();
-
     @Modifying
     @Query("delete from Period " +
             "where id in " +
