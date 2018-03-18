@@ -7,7 +7,12 @@
 <body>
 <div>
     <p th:text="'Hello, ' + ${user.email} + '!'"/>
-    <ul th:each="period : ${periods}">
+    <ul th:each="period : ${all_periods}">
+        <li th:text="${period}"></li>
+    </ul>
+
+    <p>New ones</p>
+    <ul th:each="period : ${new_periods}">
         <li th:text="${period}"></li>
     </ul>
 </div>

@@ -1,20 +1,25 @@
 package com.lztimer.server.service;
 
+import com.lztimer.server.dto.DailyUsage;
 import com.lztimer.server.entity.Period;
 import com.lztimer.server.entity.User;
 import com.lztimer.server.repository.PeriodRepository;
 import com.lztimer.server.security.SecurityService;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.var;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Service Implementation for managing Period.
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class PeriodService {
@@ -23,11 +28,7 @@ public class PeriodService {
 
     private final SecurityService securityService;
 
-    @Autowired
-    public PeriodService(PeriodRepository periodRepository, SecurityService securityService) {
-        this.periodRepository = periodRepository;
-        this.securityService = securityService;
-    }
+    private final JdbcTemplate jdbcTemplate;
 
     /**
      * Save a period and set owner to logged user.
@@ -59,4 +60,19 @@ public class PeriodService {
     void reportIncorrectPeriodUpdater(Period period, List<Period> intersectingInterval) {
         log.error("current period {}, old intersecting intervals {}", period, intersectingInterval);
     }
+
+    public List<DailyUsage> getDailyUsages(UUID userId) {
+        var sql = "select begin_time::date as beg_date, task, sum(round(extract(epoch from (end_time - begin_time)))) as secs  " +
+                "from lz_period where owner_uuid = ? " +
+                "group by begin_time::date, task " +
+                "order by begin_time::date desc";
+        return jdbcTemplate.query(sql,
+                new Object[]{userId},
+                (rs, rowNum) -> new DailyUsage(
+                        rs.getString("beg_date"),
+                        rs.getString("task"),
+                        rs.getLong("secs"))
+        );
+    }
+
 }
