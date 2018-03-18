@@ -15,7 +15,10 @@ import java.time.Instant;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "lz_period")
+@Table(name = "lz_period", indexes = {
+        @Index(columnList = "owner_uuid, begin_time", name = "begin_time_idx"),
+        @Index(columnList = "owner_uuid, end_time", name = "end_time_idx")
+})
 public class Period implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -40,6 +43,9 @@ public class Period implements Serializable {
     @ManyToOne(optional = false)
     private User owner;
 
+    @Column(name = "task")
+    private String task;
+
     public Period(Instant beginTime, Instant endTime, Boolean active) {
         this(beginTime, endTime, active, null);
     }
@@ -52,36 +58,11 @@ public class Period implements Serializable {
     }
 
     public Period(Period previous, Period next) {
-        if (previous.isActive() != next.isActive()) {
+        if (previous.getActive() != next.getActive()) {
             throw new IllegalStateException("Merging active with inactive");
         }
         this.beginTime = previous.beginTime;
         this.endTime = next.endTime;
         this.active = previous.active;
     }
-
-    public Period beginTime(Instant beginTime) {
-        this.beginTime = beginTime;
-        return this;
-    }
-
-    public Period endTime(Instant endTime) {
-        this.endTime = endTime;
-        return this;
-    }
-
-    public Boolean isActive() {
-        return active;
-    }
-
-    public Period active(Boolean active) {
-        this.active = active;
-        return this;
-    }
-
-    public Period owner(User user) {
-        this.owner = user;
-        return this;
-    }
-
 }
